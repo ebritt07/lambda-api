@@ -15,12 +15,11 @@ jobs:
         run: |
           python3 << 'EOF'
           import json, os, re
-          os.environ['ref_name'] = "feature-1"
           with open("deployment.json", "r") as f:
-            deployment_map = json.load(f)["branch-to-env-regex"]
-          branch=os.environ['ref_name']
+              deployment_map = json.load(f)["branch-to-env-regex"]
+          branch = os.environ['GITHUB_REF_NAME']
           env = None
-          for pattern, target in deployment_map:
+          for pattern, target in deployment_map.items():
               if re.fullmatch(pattern, branch):
                   env = target
           if env is None:
