@@ -1,0 +1,10 @@
+{
+  "branch-to-env-regex": {
+    "v.*": "prod",
+    "master": "dev",
+    "main": "dev",
+    "feature-.*": "dev",
+    "bugfix-.*": "dev",
+    "hotfix-.*": "dev"
+  }
+}

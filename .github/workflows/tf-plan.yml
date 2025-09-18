@@ -1,0 +1,35 @@
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  map-branch:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Determine env
+        id: map
+        run: |
+          python3 << 'EOF'
+          import json, os, re
+          os.environ['ref_name'] = "feature-1"
+          with open("deployment.json", "r") as f:
+            deployment_map = json.load(f)["branch-to-env-regex"]
+          branch=os.environ['ref_name']
+          env = None
+          for pattern, target in deployment_map:
+              if re.fullmatch(pattern, branch):
+                  env = target
+          if env is None:
+              raise Exception(f"Could not match branch '{branch}' to any env")
+          print(f"Matched branch '{branch}' to env '{env}'")
+          with open(os.environ["GITHUB_OUTPUT"], "a") as gh_out:
+              gh_out.write(f"env={env}\n")
+          EOF
+
+      - name: Print env
+        run: |
+          echo "Running in environment: ${{ steps.map.outputs.env }}"
