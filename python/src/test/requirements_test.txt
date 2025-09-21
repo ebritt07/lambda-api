@@ -1,0 +1,5 @@
+pytest==8.4.2
+fastapi==0.116.2
+boto3
+botocore
+uvicorn
