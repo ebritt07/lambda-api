@@ -1,0 +1,53 @@
+name: Python application
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: [ "**" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./python
+
+    steps:
+    - uses: actions/checkout@v5
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.13"
+    - name: Install python dependencies
+      run: |
+        echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
+        python -c "import sys; print(sys.version)"
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+    - name: Lint with flake8
+      run: |
+        flake8 -v src/main
+    - name: Test with pytest
+      run: |
+        pytest
+
+    - name: Pytest coverage comment
+      uses: MishaKav/pytest-coverage-comment@main
+      with:
+        pytest-xml-coverage-path: python/testing-results/coverage.xml
+        junitxml-path: python/testing-results/pytest.xml
+      if: github.event_name == 'pull_request'
+
+    - name: Save test results folder
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report-folder
+        path: python/testing-results
