@@ -17,6 +17,9 @@ jobs:
   tf-plan:
     runs-on: ubuntu-latest
     environment: dev
+    defaults:
+      run:
+        working-directory: ./terraform
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
@@ -47,11 +50,11 @@ jobs:
           name: tfplan
           path: tfplan
 
-      - name: Upload Zip Artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ env.zip_artifacts }}
-          path: ${{ env.zip_artifacts }}/
+      # - name: Upload Zip Artifacts
+      #   uses: actions/upload-artifact@v6
+      #   with:
+      #     name: ${{ env.zip_artifacts }}
+      #     path: ${{ env.zip_artifacts }}/
 
   tf-apply:
     needs: [tf-plan]
@@ -74,11 +77,11 @@ jobs:
         with:
           name: tfplan
 
-      - name: Download Zip Artifacts
-        uses: actions/download-artifact@v7
-        with:
-          name: ${{env.zip_artifacts}}
-          path: ${{env.zip_artifacts}}/
+      # - name: Download Zip Artifacts
+      #   uses: actions/download-artifact@v7
+      #   with:
+      #     name: ${{env.zip_artifacts}}
+      #     path: ${{env.zip_artifacts}}/
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v3
