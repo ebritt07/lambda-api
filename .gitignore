@@ -1,0 +1,24 @@
+# IDEs
+.idea/
+**/.idea/
+
+# Python bytecode
+**/__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+**/.venv/
+
+
+
+# Test/runtime artifacts
+python/src/test/dynamodb-local-metadata.json
+*/dynamodb-local-metadata.json
+python/src/test/runDynamoLocally/dynamodb-local-metadata.json
+
+# Common Python tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage

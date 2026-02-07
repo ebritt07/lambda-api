@@ -1,0 +1,6 @@
+## caution! ##
+# here, the goal is to keep lambdas Cold start time ultra quick. one way to do this is to avoid
+# adding any dependencies. so let's try to keep any dependecies native to the AWS runtime env!
+
+boto3
+botocore
