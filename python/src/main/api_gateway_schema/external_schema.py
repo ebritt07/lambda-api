@@ -1,13 +1,12 @@
-import uuid
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from src.main.lambdas.common.dynamo_schema import Bike, BikeStyle
+from src.main.lambdas.common.dynamo_schema import BikeStyle
 
 
 class BikeDTO(BaseModel):
-    make: str = Field(..., example='Orbea')
+    make: str
     model: str
     style: BikeStyle
     notes: Optional[str] = None

@@ -3,13 +3,13 @@ from dataclasses import dataclass, field
 
 @dataclass
 class APIGatewayTestEvent:
-    method:str
-    raw_path:str = ""
-    query_params : dict = field(default_factory=dict)
-    body_dict:dict = field(default_factory=dict)
+    method: str
+    raw_path: str = ""
+    query_params: dict = field(default_factory=dict)
+    body_dict: dict = field(default_factory=dict)
 
     def export_event(self) -> dict:
-        return    {
+        return {
             'version': '2.0',
             'headers': {
                 'accept': 'application/json',

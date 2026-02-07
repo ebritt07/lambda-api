@@ -1,20 +1,25 @@
 import os
 import subprocess
 import time
-from typing import List
 
 from src.main.lambdas.common.dynamo_db_client import DynamoDbClient, DYNAMO_LOCAL_PORT
 from src.main.lambdas.common.logger import logger
 from src.main.lambdas.common.dynamo_db_client import Table
 
-TABLE_NAMES = [
-   Table.BIKES,
-   Table.USERS
-]
+TABLE_NAMES = Table.__members__.values()
 
-START_COMMAND = "mvn -f runDynamoLocally/pom.xml exec:java \
-  -Dexec.mainClass=org.example.Main \
-  -Dexec.args=\"{}\"".format(DYNAMO_LOCAL_PORT)
+
+def get_start_command():
+    start_command = "mvn -f {}runDynamoLocally/pom.xml exec:java \
+      -Dexec.mainClass=org.example.Main \
+      -Dexec.args=\"{}\""
+    path = ""
+    if os.path.exists("runDynamoLocally"):
+        return start_command.format(path, DYNAMO_LOCAL_PORT)
+    if os.path.exists("src/test/runDynamoLocally"):
+        return start_command.format("src/test/", DYNAMO_LOCAL_PORT)
+    raise RuntimeError("cant find the dynamo path, cwd={}", os.getcwd())
+
 
 class LocalDynamoManager():
 
@@ -33,14 +38,18 @@ class LocalDynamoManager():
                 continue
 
     def start_local_dynamo(self):
-        logger.info(START_COMMAND)
+        if os.environ["ENV"] != "LOCAL":
+            raise RuntimeError("Env var must be LOCAL")
 
-        self.dynamodb_local_process = subprocess.Popen(START_COMMAND.split())
+        os.environ.setdefault("AWS_ACCESS_KEY_ID", "test-id")
+        os.environ.setdefault("AWS_SECRET_ACCESS_KEY", "test-key")
+
+        logger.info(get_start_command())
+        self.dynamodb_local_process = subprocess.Popen(get_start_command().split())
         self.running = True
         self.ddb_cli = DynamoDbClient()
         time.sleep(2)
         self.clean_all_tables()
-
 
         for table_name in TABLE_NAMES:
             table = self.ddb_cli.dynamodb.create_table(

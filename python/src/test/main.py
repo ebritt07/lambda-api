@@ -29,6 +29,8 @@ and business logic validations.
 """
 
 bicycle_lambda_router = APIRouter(tags=["bicycle lambdas"])
+
+
 def _unwrap_api_response(response):
     if isinstance(response, dict) and "statusCode" in response and "body" in response:
         status_code = response.get("statusCode", 200)
@@ -39,23 +41,27 @@ def _unwrap_api_response(response):
         return JSONResponse(content=body, status_code=status_code)
     return response
 
+
 @bicycle_lambda_router.get("/{id}", name="get bike by id")
 async def get_bike(id: str) -> Bike | dict:
-    api_data = APIGatewayTestEvent(method="GET", query_params={"id":id})
+    api_data = APIGatewayTestEvent(method="GET", query_params={"id": id})
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
+
 
 @bicycle_lambda_router.put("/{id}", name="update bike by id")
 async def update_bike(id: str, bike_dto: BikeDTO) -> Bike | dict:
-    api_data = APIGatewayTestEvent(method="PUT", query_params={"id":id}, body_dict=bike_dto.model_dump())
+    api_data = APIGatewayTestEvent(method="PUT", query_params={"id": id}, body_dict=bike_dto.model_dump())
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
+
 @bicycle_lambda_router.delete("/{id}", name="delete bike by id")
 async def delete_bike(id: str) -> dict:
-    api_data = APIGatewayTestEvent(method="DELETE", query_params={"id":id})
+    api_data = APIGatewayTestEvent(method="DELETE", query_params={"id": id})
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
+
 
 @bicycle_lambda_router.post("/new")
 async def save_bike(bike_dto: BikeDTO) -> Bike | dict:
@@ -63,25 +69,31 @@ async def save_bike(bike_dto: BikeDTO) -> Bike | dict:
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
+
 user_profile_lambda_router = APIRouter(tags=["user profile lambdas "])
+
+
 @user_profile_lambda_router.get("")
 async def list_my_profile(request: Request):
     return {"msg", "no usr setup yet"}
 
+
 admin_lambda_router = APIRouter(tags=["admin lambdas "])
+
+
 @admin_lambda_router.get("/tables", description="admin operation to see all tables")
 async def list_tables(request: Request):
     return _unwrap_api_response(admin_lambda.handler({}, {}))
 
 
-app = FastAPI(title= TITLE,
+app = FastAPI(title=TITLE,
               description=DESCRIPTION)
 app.include_router(bicycle_lambda_router, prefix="/bike")
 app.include_router(user_profile_lambda_router, prefix="/usr")
 app.include_router(admin_lambda_router, prefix="/admin")
 
 if __name__ == "__main__":
-    os.putenv("ENV", "LOCAL")
+    os.environ["ENV"] = "LOCAL"
     local_ddb = LocalDynamoManager()
     local_ddb.start_local_dynamo()
     uvicorn.run(app)

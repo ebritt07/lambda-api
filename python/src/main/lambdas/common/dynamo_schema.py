@@ -11,6 +11,7 @@ class BikeStyle(StrEnum):
     CRUISER = "CRUISER"
     FIXIE = "FIXIE"
 
+
 @dataclass
 class Bike:
     make: str
@@ -18,4 +19,3 @@ class Bike:
     style: str
     notes: Optional[str]
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-

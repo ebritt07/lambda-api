@@ -10,11 +10,11 @@ def _normalize_body(body: Any) -> Any:
 
 
 def api_response(
-    body: Any,
-    *,
-    status_code: int = 200,
-    headers: Optional[Dict[str, str]] = None,
-    is_base64_encoded: bool = False,
+        body: Any,
+        *,
+        status_code: int = 200,
+        headers: Optional[Dict[str, str]] = None,
+        is_base64_encoded: bool = False,
 ) -> Dict[str, Any]:
     safe_body = _normalize_body(body)
     return {
