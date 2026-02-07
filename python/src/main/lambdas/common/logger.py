@@ -2,6 +2,8 @@ import logging
 from logging import Formatter
 
 logger = logging.getLogger('evo-sim')
+#logger.setLevel(logging.INFO)
+
 logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)

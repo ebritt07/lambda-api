@@ -1,5 +1,5 @@
-from src.main.common.dynamo_db_client import DynamoDbClient
-from src.main.common.logger import logger
+from src.main.lambdas.common.dynamo_db_client import DynamoDbClient
+from src.main.lambdas.common.logger import logger
 
 dynamodb = DynamoDbClient()
 
@@ -8,3 +8,4 @@ def handler(event, context):
     tables = dynamodb.list_tables()
     logger.info(f"tables:{tables}")
     return tables
+
