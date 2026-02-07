@@ -13,7 +13,7 @@ permissions:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     defaults:
       run:
@@ -25,6 +25,13 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: "3.13"
+    - name: Set up DynamoDB Local
+      uses: actions/setuo-java@v3
+      with:
+        version: "latest"
+        run: |
+          cd python/src/test/runDynamoLocally
+          mvn install
     - name: Install python dependencies
       run: |
         echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
