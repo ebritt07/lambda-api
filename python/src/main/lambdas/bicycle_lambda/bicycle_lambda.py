@@ -20,7 +20,10 @@ def handler(event, context):
             }
         )
         logger.info("result of get from table: {}", response)
-        return api_response(response.get('Item', {}))
+        item = response.get('Item')
+        if not item:
+            return api_response({"message": "Bike not found"}, status_code=404)
+        return api_response(item)
 
 
     bike = Bike(**event["body"])
@@ -30,4 +33,3 @@ def handler(event, context):
     )
     logger.info("result of put into table: {}", result)
     return api_response(bike)
-

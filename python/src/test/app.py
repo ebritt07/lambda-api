@@ -2,6 +2,7 @@ import os
 import uvicorn
 import json
 from fastapi import FastAPI, Request, APIRouter
+from fastapi.responses import JSONResponse
 
 from src.main.api_gateway_schema.external_schema import BikeDTO
 from src.main.lambdas.admin_lambda import admin_lambda
@@ -30,10 +31,12 @@ and business logic validations.
 bicycle_lambda_router = APIRouter(tags=["bicycle lambdas"])
 def _unwrap_api_response(response):
     if isinstance(response, dict) and "statusCode" in response and "body" in response:
+        status_code = response.get("statusCode", 200)
         try:
-            return json.loads(response["body"])
+            body = json.loads(response["body"])
         except Exception:
-            return response["body"]
+            body = response["body"]
+        return JSONResponse(content=body, status_code=status_code)
     return response
 
 @bicycle_lambda_router.get("/{id}", name="get bike by id")
