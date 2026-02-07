@@ -22,8 +22,15 @@ class DynamoDbClient:
         else:
             self.dynamodb = boto3.resource("dynamodb")
 
-    def list_tables(self):
-        return self.dynamodb.list_tables()
+    def preview_tables(self):
+        """show up to 3 items from all tables"""
+        table_names = self.dynamodb.meta.client.list_tables().get("TableNames", [])
+        previews = {}
+        for table_name in table_names:
+            table = self.dynamodb.Table(table_name)
+            response = table.scan(Limit=3)
+            previews[table_name] = response.get("Items", [])
+        return previews
 
 
     def get_item_from_table(self, key: str, table_name: Table):

@@ -6,6 +6,6 @@ dynamodb = DynamoDbClient()
 
 def handler(event, context):
     logger.info(f"got an event: {event}")
-    tables = dynamodb.list_tables()
-    logger.info(f"tables:{tables}")
-    return api_response(tables)
+    previews = dynamodb.preview_tables()
+    logger.info(f"table previews:{previews}")
+    return api_response(previews)
