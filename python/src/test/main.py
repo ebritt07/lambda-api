@@ -82,8 +82,6 @@ app.include_router(admin_lambda_router, prefix="/admin")
 
 if __name__ == "__main__":
     os.putenv("ENV", "LOCAL")
-    os.putenv("AWS_ACCESS_KEY_ID", "test-id")
-    os.putenv("AWS_SECRET_ACCESS_KEY", "test-key")
     local_ddb = LocalDynamoManager()
     local_ddb.start_local_dynamo()
     uvicorn.run(app)
