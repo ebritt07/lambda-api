@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: tfplan
-          path: tfplan
+          path: ./terraform/tfplan
 
       # - name: Upload Zip Artifacts
       #   uses: actions/upload-artifact@v6
@@ -58,8 +58,11 @@ jobs:
 
   tf-apply:
     needs: [tf-plan]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push'}} # && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
     environment: dev
     steps:
       - name: Checkout repo
