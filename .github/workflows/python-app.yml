@@ -33,7 +33,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Install DynamoDB Local
-      run: mvn install
+      run: |
+        cd python/src/test/runDynamoLocally
+        mvn install
     - name: Install python dependencies
       run: |
         echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
