@@ -34,7 +34,7 @@ jobs:
         cache: maven
     - name: Install DynamoDB Local
       run: |
-        cd python/src/test/runDynamoLocally
+        cd src/test/runDynamoLocally
         mvn install
     - name: Install python dependencies
       run: |
