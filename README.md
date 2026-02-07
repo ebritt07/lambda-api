@@ -2,10 +2,10 @@
 
 lambda + api + dynamo db app, and aws infra deployment
 
-### startup dynamodb local
+### setup dynamodb local
+set up the local dynamo db runner so it can be booted up by the pythontest app
 - `cd python/src/test/runDynamoLocally`
 - `mvn clean install`
-- `mvn exec:java -Dexec.mainClass=.org.example.Main -Dexec.args="--port=9001"`
 
 
 ### startup
@@ -14,7 +14,7 @@ lambda + api + dynamo db app, and aws infra deployment
 - `source .venv/bin/activate`
 - `export PYTHONPATH=$PYTHONPATH:.`
 - test via interactive UI:
-  - `uvicorn src.test.Launcher:app --reload`
+- `python src.test.main.app`
   - you can test the lambdas at http://127.0.0.1:8000/docs
 - or, test via unit tests
   - `pytest`

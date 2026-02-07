@@ -4,6 +4,7 @@ from src.main.lambdas.common.dynamo_db_client import DynamoDbClient
 from src.main.lambdas.common.dynamo_db_client import Table
 from src.main.lambdas.common.dynamo_schema import Bike
 from src.main.lambdas.common.logger import logger
+from src.main.lambdas.common.api_gateway_response import api_response
 
 ddb = DynamoDbClient()
 table = ddb.dynamodb.Table(Table.BIKES)
@@ -19,7 +20,7 @@ def handler(event, context):
             }
         )
         logger.info("result of get from table: {}", response)
-        return response.get('Item', {})
+        return api_response(response.get('Item', {}))
 
 
     bike = Bike(**event["body"])
@@ -28,6 +29,5 @@ def handler(event, context):
         Item=bike_dict
     )
     logger.info("result of put into table: {}", result)
-    return bike
-
+    return api_response(bike)
 
