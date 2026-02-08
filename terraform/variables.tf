@@ -7,3 +7,8 @@ variable "env" {
   type    = string
   default = "dev"
 }
+
+variable "zip_output_dir" {
+  type = "string"
+  default = "zip-artifacts"
+}
