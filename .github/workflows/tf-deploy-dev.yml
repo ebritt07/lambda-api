@@ -38,6 +38,11 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Force Unlock
+        run: |
+          terraform init
+          terraform force-unlock -force 2ce4550e-1fe6-cfe3-12bb-25c93aa24a42
+
       - name: Terraform Validate
         run: terraform validate
 
