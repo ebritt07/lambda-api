@@ -17,6 +17,11 @@ variable "source_dir" {
   type = string
 }
 
+variable "zip_output_dir" {
+  type    = string
+  default = "${path.root}/.lambda_zips"
+}
+
 variable "dynamodb_table_arn" {
   type = string
 }
