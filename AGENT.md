@@ -1,7 +1,5 @@
 # AGENT.md
 
-## Instructions
-- Before raising PR's, do review 
 
 ## Goals
 - Python Lambda API for read and writing to dynamo DB.
@@ -17,8 +15,7 @@
 
 ## Architecture Map
 - Python Lambda logic (handlers + core logic): `python/src/main/lambdas/`
-- API schema / DTOs: `python/src/main/api_gateway_schema/`
- - These will be plugged into API Gateway V2
+- API schema / DTOs: `python/src/main/api_gateway_schema/`. These will be plugged into API Gateway V2.
 - Local dev/test harness (FastAPI): `python/src/test/main.py`
 - Tests + local DynamoDB helpers: `python/src/test/`
 - Infra (Terraform): `terraform/` (with env vars under `terraform/env/`)
@@ -41,9 +38,13 @@
   - `terraform/backend.tf`
   - `terraform/backend-setup/`
 
-## Tests
+## Tests Instructions
 - Command: `pytest` 
-- Integration tests are marked skipped in local codex env due to unable to start dynamodb
+- Integration tests are marked skipped in the Codex environment (local `pytest` won't run them); use Docker below for integration coverage
+- Default for small changes: run local `pytest` only (no Docker)
+- Before submitting a PR: run Docker integration flow once
+  - `docker build -f Dockerfile.integration -t lambda-api-integration .`
+  - `docker run --rm lambda-api-integration`
 
 ## Workflows
 - Python CI: `.github/workflows/python-app.yml`
@@ -54,5 +55,3 @@
   - `tf-plan` on pushes to `main`, `feature-*`, `bugfix-*`
   - `tf-apply` only on `main` push
   - Uses OIDC with `vars.AWS_ROLE_ARN`
-
-
