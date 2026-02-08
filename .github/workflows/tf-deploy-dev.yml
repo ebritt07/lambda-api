@@ -10,7 +10,9 @@ permissions:
 
 on:
   push:
-    branches: [main, feature-*, bugfix-*]
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
 

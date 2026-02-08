@@ -1,10 +1,10 @@
 resource "aws_dynamodb_table" "bikes" {
   name         = "BIKES"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "ID"
+  hash_key     = "id"
 
   attribute {
-    name = "ID"
+    name = "id"
     type = "S"
   }
 }
