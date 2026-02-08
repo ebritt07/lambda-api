@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "bikes" {
-  name         = "${var.org_name}-bikes"
+  name         = "BIKES"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "ID"
 
