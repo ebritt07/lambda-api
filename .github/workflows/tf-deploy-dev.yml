@@ -52,11 +52,14 @@ jobs:
           name: tfplan
           path: ./terraform/tfplan
 
-      # - name: Upload Zip Artifacts
-      #   uses: actions/upload-artifact@v6
-      #   with:
-      #     name: ${{ env.zip_artifacts }}
-      #     path: ${{ env.zip_artifacts }}/
+      - name: list directories
+        run: ls -R .
+
+      - name: Upload Zip Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ env.zip_artifacts }}
+          path: ./terraform/${{ env.zip_artifacts }}/
 
   tf-apply:
     needs: [tf-plan]
@@ -83,11 +86,11 @@ jobs:
           name: tfplan
           path: ./terraform
 
-      # - name: Download Zip Artifacts
-      #   uses: actions/download-artifact@v7
-      #   with:
-      #     name: ${{env.zip_artifacts}}
-      #     path: ${{env.zip_artifacts}}/
+      - name: Download Zip Artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: ${{env.zip_artifacts}}
+          path: ./terraform/${{env.zip_artifacts}}/
 
       - name: Terraform Setup
         uses: hashicorp/setup-terraform@v3
