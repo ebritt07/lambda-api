@@ -10,7 +10,8 @@ set up the local dynamo db runner so it can be booted up by the pythontest app
 ### integration tests via Docker
 Run the same steps as the CI deployment stage inside a container (Python 3.13 + JDK 21 + DynamoDB Local).
 - `docker build -f Dockerfile.integration -t lambda-api-integration .`
-- `docker run --rm lambda-api-integration pytest -s -o log_cli=true -o log_cli_level=INFO`
+- `docker run --rm lambda-api-integration`
+- (equivalent explicit command) `docker run --rm lambda-api-integration pytest -s -o log_cli=true -o log_cli_level=INFO`
 
 
 ### startup
