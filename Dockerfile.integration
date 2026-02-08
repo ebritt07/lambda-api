@@ -1,0 +1,24 @@
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/python \
+    ENV=LOCAL
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        openjdk-21-jdk \
+        maven \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY python/ /app/python/
+WORKDIR /app/python
+
+RUN python -m pip install --upgrade pip \
+    && pip install -r requirements.txt \
+    && pip install -r requirements-test.txt
+
+RUN mvn -f src/test/runDynamoLocally/pom.xml install
+
+CMD ["pytest"]
