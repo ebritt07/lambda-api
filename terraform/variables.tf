@@ -3,7 +3,7 @@ variable "region" {
   default = "us-east-1"
 }
 
-variable "org_name" {
+variable "env" {
   type    = string
-  default = "ebritt07"
+  default = "dev"
 }
