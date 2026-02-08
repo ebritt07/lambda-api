@@ -41,7 +41,8 @@
 ## Tests Instructions
 - Command: `pytest` 
 - Integration tests are marked skipped in the Codex environment (local `pytest` won't run them); use Docker below for integration coverage
-- Default for small changes: run local `pytest` only (no Docker)
+- Default for small changes: run local `pytest` only (no Docker integration)
+- Do not run Docker integration on every change; reserve it for pre-PR verification
 - Before submitting a PR: run Docker integration flow once
   - `docker build -f Dockerfile.integration -t lambda-api-integration .`
   - `docker run --rm lambda-api-integration`
