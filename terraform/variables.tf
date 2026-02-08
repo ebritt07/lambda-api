@@ -10,5 +10,5 @@ variable "env" {
 
 variable "zip_output_dir" {
   type = "string"
-  default = "zip-artifacts"
+  default = "zip_artifacts"
 }
