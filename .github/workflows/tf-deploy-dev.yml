@@ -12,7 +12,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [feature/*, codex/*, bugfix/*]
+    branches: [main]
 
 jobs:
 
