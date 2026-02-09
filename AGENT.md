@@ -46,6 +46,13 @@
 - Before submitting a PR: run Docker integration flow once
   - `docker build -f Dockerfile.integration -t lambda-api-integration .`
   - `docker run --rm lambda-api-integration`
+  
+## PR Description Format
+- Use plain text only. No headings, bullets, or fancy formatting.
+- Include two labeled lines:
+  - Summary: description of the change
+  - Testing: describe what you ran, not the exact command
+    - Example: "Docker integration test" or "Local pytest"
 
 ## Workflows
 - Python CI: `.github/workflows/python-app.yml`
