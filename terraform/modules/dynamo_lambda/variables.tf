@@ -22,7 +22,13 @@ variable "zip_output_dir" {
 }
 
 variable "dynamodb_table_arn" {
-  type = string
+  type    = string
+  default = null
+}
+
+variable "policy_arns" {
+  type    = list(string)
+  default = []
 }
 
 variable "memory_size" {

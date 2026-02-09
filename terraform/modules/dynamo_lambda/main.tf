@@ -17,6 +17,8 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 data "aws_iam_policy_document" "dynamodb_access" {
+  count = var.dynamodb_table_arn == null ? 0 : 1
+
   statement {
     actions = [
       "dynamodb:DeleteItem",
@@ -37,8 +39,9 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 resource "aws_iam_policy" "dynamodb_access" {
+  count  = var.dynamodb_table_arn == null ? 0 : 1
   name   = "${var.function_name}-dynamodb"
-  policy = data.aws_iam_policy_document.dynamodb_access.json
+  policy = data.aws_iam_policy_document.dynamodb_access[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "basic_execution" {
@@ -47,8 +50,15 @@ resource "aws_iam_role_policy_attachment" "basic_execution" {
 }
 
 resource "aws_iam_role_policy_attachment" "dynamodb_execution" {
+  count      = var.dynamodb_table_arn == null ? 0 : 1
   role       = aws_iam_role.lambda_role.name
-  policy_arn = aws_iam_policy.dynamodb_access.arn
+  policy_arn = aws_iam_policy.dynamodb_access[0].arn
+}
+
+resource "aws_iam_role_policy_attachment" "extra_policies" {
+  for_each   = toset(var.policy_arns)
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = each.value
 }
 
 resource "aws_lambda_function" "this" {
