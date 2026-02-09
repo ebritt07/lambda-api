@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import json
-from fastapi import FastAPI, Request, APIRouter
+from fastapi import FastAPI, Request, APIRouter, Query
 from fastapi.responses import JSONResponse
 
 from src.main.api_gateway_schema.external_schema import BikeDTO
@@ -12,7 +12,7 @@ from src.main.lambdas.common.logger import logger
 from src.test.test_util.api_gateway_event import APIGatewayTestEvent
 from src.test.test_util.dynamodb import LocalDynamoManager
 
-TITLE = "[Local] Lambda API Tester"
+TITLE = "Lambda API Schema"
 DESCRIPTION = """
 
 Interactive tester:
@@ -42,8 +42,8 @@ def _unwrap_api_response(response):
     return response
 
 
-@bicycle_lambda_router.get("/{id}", name="get bike by id")
-async def get_bike(id: str) -> Bike | dict:
+@bicycle_lambda_router.get("", name="get bike by id")
+async def get_bike(id: str = Query(...)) -> Bike | dict:
     api_data = APIGatewayTestEvent(method="GET", query_params={"id": id})
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
