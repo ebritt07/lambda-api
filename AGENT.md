@@ -47,12 +47,12 @@
   - `docker build -f Dockerfile.integration -t lambda-api-integration .`
   - `docker run --rm lambda-api-integration`
   
-## PR Description Format
-- Use plain text only. No headings, bullets, or fancy formatting.
+# PR Description Format
 - Include two labeled lines:
   - Summary: description of the change
   - Testing: describe what you ran, not the exact command
-    - Example: "Docker integration test" or "Local pytest"
+  - Example:
+    `#### Summary:\n - Update FastAPI GET /bike to use query param id\n - align integration test GET endpoint\n - Clarify plain-text PR description format in AGENT.md.\n\n #### Testing:\n - Ran Docker integration test`
 
 ## Workflows
 - Python CI: `.github/workflows/python-app.yml`
