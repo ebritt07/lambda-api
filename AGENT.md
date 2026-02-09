@@ -47,7 +47,7 @@
   - `docker build -f Dockerfile.integration -t lambda-api-integration .`
   - `docker run --rm lambda-api-integration`
   
-# PR Description Format
+## PR Description Format
 - Include two labeled lines:
   - Summary: description of the change
   - Testing: describe what you ran, not the exact command
