@@ -39,7 +39,9 @@
   - `terraform/backend-setup/`
 
 ## Tests Instructions
-- Command: `pytest` 
+- Run from `python/`
+- Install test deps first: `python3 -m pip install -r requirements-test.txt`
+- Command: `python3 -m pytest`
 - Integration tests are marked skipped in the Codex environment (local `pytest` won't run them); use Docker below for integration coverage
 - Default for small changes: run local `pytest` only (no Docker integration)
 - Do not run Docker integration on every change; reserve it for pre-PR verification
