@@ -49,15 +49,15 @@ async def get_bike(id: str = Query(...)) -> Bike | dict:
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
 
-@bicycle_lambda_router.put("/{id}", name="update bike by id")
-async def update_bike(id: str, bike_dto: BikeDTO) -> Bike | dict:
+@bicycle_lambda_router.put("", name="update bike by id")
+async def update_bike(id: str = Query(...), bike_dto: BikeDTO = ...) -> Bike | dict:
     api_data = APIGatewayTestEvent(method="PUT", query_params={"id": id}, body_dict=bike_dto.model_dump())
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
 
-@bicycle_lambda_router.delete("/{id}", name="delete bike by id")
-async def delete_bike(id: str) -> dict:
+@bicycle_lambda_router.delete("", name="delete bike by id")
+async def delete_bike(id: str = Query(...)) -> dict:
     api_data = APIGatewayTestEvent(method="DELETE", query_params={"id": id})
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
