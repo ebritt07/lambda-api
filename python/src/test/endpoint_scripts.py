@@ -8,6 +8,8 @@ import requests
 
 from src.api_gateway_schema.external_schema import BikeDTO
 
+BASE_URL = os.environ["LAMBDA_BASE_URL"]
+
 def _resolve_method() -> str:
     for i in ["GET", "POST", "PUT"]:
         if input(i + "? (y/n)") == "y":
@@ -17,20 +19,24 @@ def _resolve_method() -> str:
 def run() -> int:
     method = _resolve_method()
     id = input("ID:")
+    malformed = input("malform the input? (y/n)") == "y"
     request_start = time.perf_counter()
 
     if method == "GET":
-        endpoint = "https://3gkge57tg1.execute-api.us-east-1.amazonaws.com/bike"
+        endpoint = f"{BASE_URL}/bike"
         endpoint += f"?id={id}"
         response = requests.get(endpoint, timeout=30)
 
     if method == "POST":
-        endpoint = "https://3gkge57tg1.execute-api.us-east-1.amazonaws.com/bike/new"
-        bike = BikeDTO(make="orbea", model="orca", )
-        response = requests.post(endpoint, json=bike.model_dump(), timeout=30)
+        endpoint = f"{BASE_URL}/bike/new"
+        bike = BikeDTO(make="orbea", model="orca", style="FIXIE")
+        json = bike.model_dump()
+        if malformed:
+            json = {"weird":2}
+        response = requests.post(endpoint, json, timeout=30)
 
     if method == "PUT":
-        endpoint = "https://3gkge57tg1.execute-api.us-east-1.amazonaws.com/bike"
+        endpoint = f"{BASE_URL}/bike"
         endpoint += f"?id={id}"
         bike = BikeDTO(make="orbea", model="orca "+str(random.random()), style="FIXIE")
         response = requests.put(endpoint, json=bike.model_dump(), timeout=30)
