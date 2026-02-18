@@ -1,4 +1,5 @@
 from dataclasses import asdict
+import json
 
 from src.main.lambdas.common.dynamo_db_client import DynamoDbClient
 from src.main.lambdas.common.dynamo_db_client import Table
@@ -29,7 +30,10 @@ def handler(event, context):
         if not response.get("Item"):
             return api_response({"message": "Bike not found"}, status_code=404)
 
-        bike_data = dict(event["body"])
+        body = event["body"]
+        if isinstance(body, str):
+            body = json.loads(body)
+        bike_data = dict(body)
         bike_data["id"] = bike_id
         bike = Bike(**bike_data)
         bike_dict = asdict(bike)
@@ -47,7 +51,10 @@ def handler(event, context):
         logger.info(bike_id)
         return api_response(None, status_code=204)
 
-    bike = Bike(**event["body"])
+    body = event["body"]
+    if isinstance(body, str):
+        body = json.loads(body)
+    bike = Bike(**body)
     bike_dict = asdict(bike)
     table.put_item(
         Item=bike_dict

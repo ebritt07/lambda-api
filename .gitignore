@@ -22,3 +22,4 @@ python/src/test/runDynamoLocally/dynamodb-local-metadata.json
 .mypy_cache/
 .ruff_cache/
 .coverage
+.vscode/
