@@ -4,7 +4,7 @@ import json
 from fastapi import FastAPI, Request, APIRouter, Query
 from fastapi.responses import JSONResponse
 
-from src.main.api_gateway_schema.external_schema import BikeDTO
+from src.api_gateway_schema.external_schema import BikeDTO
 from src.main.lambdas.admin_lambda import admin_lambda
 from src.main.lambdas.bicycle_lambda import bicycle_lambda
 from src.main.lambdas.common.dynamo_schema import Bike
@@ -51,7 +51,11 @@ async def get_bike(id: str = Query(...)) -> Bike | dict:
 
 @bicycle_lambda_router.put("", name="update bike by id")
 async def update_bike(id: str = Query(...), bike_dto: BikeDTO = ...) -> Bike | dict:
-    api_data = APIGatewayTestEvent(method="PUT", query_params={"id": id}, body_dict=bike_dto.model_dump())
+    api_data = APIGatewayTestEvent(
+        method="PUT",
+        query_params={"id": id},
+        body_json_str=json.dumps(bike_dto.model_dump()),
+    )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
@@ -65,7 +69,10 @@ async def delete_bike(id: str = Query(...)) -> dict:
 
 @bicycle_lambda_router.post("/new")
 async def save_bike(bike_dto: BikeDTO) -> Bike | dict:
-    api_data = APIGatewayTestEvent(method="POST", body_dict=bike_dto.model_dump())
+    api_data = APIGatewayTestEvent(
+        method="POST",
+        body_json_str=json.dumps(bike_dto.model_dump()),
+    )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
