@@ -11,6 +11,9 @@ def _resolve_endpoint() -> str:
     endpoint = os.getenv("LAMBDA_API_ENDPOINT")
     if endpoint:
         return endpoint
+    endpoint = input("Endpoint URL: ").strip()
+    if endpoint:
+        return endpoint
     print("Provide endpoint as argv[1] or set LAMBDA_API_ENDPOINT.", file=sys.stderr)
     raise SystemExit(1)
 
@@ -19,6 +22,9 @@ def main() -> int:
     endpoint = _resolve_endpoint()
     response = requests.get(endpoint, timeout=30)
     print(f"GET {endpoint} -> {response.status_code}")
+    print(response.text)
+    response = requests.post(endpoint, timeout=30)
+    print(f"POST {endpoint} -> {response.status_code}")
     print(response.text)
     return 0
 

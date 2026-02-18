@@ -54,7 +54,7 @@ async def update_bike(id: str = Query(...), bike_dto: BikeDTO = ...) -> Bike | d
     api_data = APIGatewayTestEvent(
         method="PUT",
         query_params={"id": id},
-        body_json_str=json.dumps(bike_dto.model_dump()),
+        body_json_str=bike_dto.model_dump_json(),
     )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
@@ -71,7 +71,7 @@ async def delete_bike(id: str = Query(...)) -> dict:
 async def save_bike(bike_dto: BikeDTO) -> Bike | dict:
     api_data = APIGatewayTestEvent(
         method="POST",
-        body_json_str=json.dumps(bike_dto.model_dump()),
+        body_json_str=bike_dto.model_dump_json(),
     )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
