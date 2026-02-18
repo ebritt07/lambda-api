@@ -34,3 +34,8 @@ variable "timeout" {
   type    = number
   default = 10
 }
+
+variable "env" {
+  type    = string
+  default = "dev"
+}
