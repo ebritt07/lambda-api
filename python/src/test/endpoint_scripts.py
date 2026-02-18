@@ -23,7 +23,13 @@ def main() -> int:
     response = requests.get(endpoint, timeout=30)
     print(f"GET {endpoint} -> {response.status_code}")
     print(response.text)
-    response = requests.post(endpoint, timeout=30)
+    bike_payload = {
+        "brand": "All-City",
+        "color": "navy",
+        "model": "Space Horse",
+        "year": 2022,
+    }
+    response = requests.post(endpoint, json=bike_payload, timeout=30)
     print(f"POST {endpoint} -> {response.status_code}")
     print(response.text)
     return 0
