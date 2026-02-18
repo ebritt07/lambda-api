@@ -16,11 +16,11 @@ def _resolve_method() -> str:
 
 def run() -> int:
     method = _resolve_method()
+    id = input("ID:")
     request_start = time.perf_counter()
 
     if method == "GET":
         endpoint = "https://3gkge57tg1.execute-api.us-east-1.amazonaws.com/bike"
-        id = input("ID:")
         endpoint += f"?id={id}"
         response = requests.get(endpoint, timeout=30)
 
@@ -31,7 +31,6 @@ def run() -> int:
 
     if method == "PUT":
         endpoint = "https://3gkge57tg1.execute-api.us-east-1.amazonaws.com/bike"
-        id = input("ID:")
         endpoint += f"?id={id}"
         bike = BikeDTO(make="orbea", model="orca "+str(random.random()), style="FIXIE")
         response = requests.put(endpoint, json=bike.model_dump(), timeout=30)
