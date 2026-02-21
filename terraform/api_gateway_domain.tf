@@ -5,6 +5,7 @@ locals {
 resource "aws_api_gateway_domain_name" "lambda_collection" {
   domain_name              = local.api_custom_domain_name
   regional_certificate_arn = var.root_domain_certificate_arn
+  security_policy          = "SecurityPolicy_TLS13_1_3_FIPS_2025_09"
 
   endpoint_configuration {
     types = ["REGIONAL"]
