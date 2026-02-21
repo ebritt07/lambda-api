@@ -7,3 +7,8 @@ variable "env" {
   type    = string
   default = "dev"
 }
+
+variable "api_gateway_name" {
+  type    = string
+  default = "api-lambda-collection"
+}
