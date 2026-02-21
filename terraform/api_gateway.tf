@@ -1,43 +1,44 @@
 locals {
   api_gateway_contract_path = "openapi/openapi.json"
-  api_gateway_route_lambda_map = {
-    "/admin" = "admin"
-    "/bike"  = "bicycle"
-  }
 
   api_gateway_contract = jsondecode(file("${path.root}/${local.api_gateway_contract_path}"))
 
   api_gateway_lambda_targets = {
-    admin = {
+    "/admin" = {
       lambda_arn  = module.admin_lambda.lambda_arn
       lambda_name = module.admin_lambda.lambda_name
     }
-    bicycle = {
+    "/bike" = {
       lambda_arn  = module.bicycle_lambda.lambda_arn
       lambda_name = module.bicycle_lambda.lambda_name
     }
   }
 
-  api_gateway_route_prefixes_sorted = [
-    for pair in reverse(sort([
-      for prefix in keys(local.api_gateway_route_lambda_map) :
-      format("%05d|%s", length(prefix), prefix)
-    ])) :
-    split("|", pair)[1]
-  ]
-
-  api_gateway_unknown_lambda_keys = setsubtract(
-    toset(values(local.api_gateway_route_lambda_map)),
-    toset(keys(local.api_gateway_lambda_targets))
-  )
+  api_gateway_matching_prefixes = {
+    for path_name in keys(local.api_gateway_contract.paths) :
+    path_name => [
+      for prefix in keys(local.api_gateway_lambda_targets) :
+      prefix if startswith(path_name, prefix)
+    ]
+  }
 
   api_gateway_unmapped_paths = [
-    for path_name in keys(local.api_gateway_contract.paths) :
-    path_name if length([
-      for prefix in local.api_gateway_route_prefixes_sorted :
-      prefix if startswith(path_name, prefix)
-    ]) == 0
+    for path_name, prefixes in local.api_gateway_matching_prefixes :
+    path_name if length(prefixes) == 0
   ]
+
+  # Resolve each API path to the most specific configured prefix.
+  api_gateway_path_target_prefix = {
+    for path_name, prefixes in local.api_gateway_matching_prefixes :
+    path_name => one([
+      for prefix in prefixes :
+      prefix if length(prefix) == max([
+        for candidate in prefixes :
+        length(candidate)
+      ]...)
+    ])
+    if length(prefixes) > 0
+  }
 
   api_gateway_http_methods = ["get", "put", "post", "delete", "patch", "head", "options"]
 
@@ -55,12 +56,7 @@ locals {
               payloadFormatVersion = "1.0"
               uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${
                 local.api_gateway_lambda_targets[
-                  local.api_gateway_route_lambda_map[
-                    [
-                      for prefix in local.api_gateway_route_prefixes_sorted :
-                      prefix if startswith(path_name, prefix)
-                    ][0]
-                  ]
+                  local.api_gateway_path_target_prefix[path_name]
                 ].lambda_arn
               }/invocations"
             }
@@ -104,25 +100,18 @@ resource "aws_api_gateway_rest_api" "lambda_collection" {
 
   lifecycle {
     precondition {
-      condition     = length(local.api_gateway_unknown_lambda_keys) == 0
-      error_message = "local.api_gateway_route_lambda_map references undefined lambda keys."
-    }
-    precondition {
       condition     = length(local.api_gateway_unmapped_paths) == 0
-      error_message = "Some OpenAPI paths do not match any local.api_gateway_route_lambda_map prefix."
+      error_message = "Some OpenAPI paths do not match any local.api_gateway_lambda_targets path_prefix."
     }
   }
 }
 
 resource "aws_lambda_permission" "api_gateway_invoke" {
-  for_each = toset([
-    for key in values(local.api_gateway_route_lambda_map) :
-    key if contains(keys(local.api_gateway_lambda_targets), key)
-  ])
+  for_each = local.api_gateway_lambda_targets
 
-  statement_id  = "AllowExecutionFromApiGateway${replace(title(each.key), "_", "")}"
+  statement_id  = "AllowExecutionFromApiGateway${replace(title(each.value.lambda_name), "_", "")}"
   action        = "lambda:InvokeFunction"
-  function_name = local.api_gateway_lambda_targets[each.key].lambda_name
+  function_name = each.value.lambda_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.lambda_collection.execution_arn}/*/*"
 }
