@@ -6,7 +6,9 @@ module "bicycle_lambda" {
   runtime            = "python3.12"
   source_dir         = "${path.root}/../python"
   zip_output_dir     = local.zip_output_dir
-  dynamodb_table_arn = aws_dynamodb_table.bikes.arn
+  dynamodb_table_arns = [
+    aws_dynamodb_table.bikes.arn
+  ]
   env = var.env
 }
 
@@ -18,6 +20,9 @@ module "admin_lambda" {
   runtime            = "python3.12"
   source_dir         = "${path.root}/../python"
   zip_output_dir     = local.zip_output_dir
-  dynamodb_table_arn = aws_dynamodb_table.bikes.arn
-  env                = var.env
+  dynamodb_table_arns = [
+    aws_dynamodb_table.bikes.arn,
+    aws_dynamodb_table.users.arn
+  ]
+  env = var.env
 }
