@@ -1,2 +1,4 @@
 region = "us-east-1"
 env    = "dev"
+root_domain_name = "ebritt07.click"
+root_domain_certificate_arn = "arn:aws:acm:us-east-1:862315107606:certificate/e6ee5a61-3096-4978-9608-41628c887f0b"
