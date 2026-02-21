@@ -4,8 +4,7 @@ variable "function_name" {
 }
 
 variable "handler" {
-  type    = string
-  default = "src.main.lambdas.bicycle_lambda.bicycle_lambda.handler"
+  type = string
 }
 
 variable "runtime" {

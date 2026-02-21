@@ -1,7 +1,12 @@
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = var.source_dir
-  excludes    = ["requirements-test.txt", "requirements.txt", "src/test/**"]
+  excludes    = [
+    # only include files in python/src/main
+    "requirements-test.txt",
+    "requirements.txt",
+    "src/test/**",
+    "src/api_gateway_schema/**"]
   output_path = "${var.zip_output_dir}/${var.function_name}.zip"
 }
 

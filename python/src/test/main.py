@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import json
-from fastapi import FastAPI, Request, APIRouter, Query
+from fastapi import FastAPI, APIRouter, Query
 from fastapi.responses import JSONResponse
 
 from src.api_gateway_schema.external_schema import BikeDTO
@@ -64,26 +64,17 @@ async def save_bike(bike_dto: BikeDTO) -> Bike | dict:
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
 
-user_profile_lambda_router = APIRouter(tags=["user profile lambdas "])
-
-
-@user_profile_lambda_router.get("")
-async def list_my_profile(request: Request):
-    return {"msg", "no usr setup yet"}
-
-
 admin_lambda_router = APIRouter(tags=["admin lambdas "])
 
 
 @admin_lambda_router.get("/tables", description="admin operation to see all tables")
-async def list_tables(request: Request):
+async def list_tables():
     return _unwrap_api_response(admin_lambda.handler({}, {}))
 
 
 app = FastAPI(title=TITLE,
               description=DESCRIPTION)
 app.include_router(bicycle_lambda_router, prefix="/bike")
-app.include_router(user_profile_lambda_router, prefix="/usr")
 app.include_router(admin_lambda_router, prefix="/admin")
 
 if __name__ == "__main__":
