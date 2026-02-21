@@ -1,39 +1,65 @@
 #!/usr/bin/env python3
+import json
 import os
-import sys
-
+import random
+import time
 import requests
 
+from src.api_gateway_schema.external_schema import BikeDTO
 
-def _resolve_endpoint() -> str:
-    if len(sys.argv) > 1:
-        return sys.argv[1]
-    endpoint = os.getenv("LAMBDA_API_ENDPOINT")
-    if endpoint:
-        return endpoint
-    endpoint = input("Endpoint URL: ").strip()
-    if endpoint:
-        return endpoint
-    print("Provide endpoint as argv[1] or set LAMBDA_API_ENDPOINT.", file=sys.stderr)
-    raise SystemExit(1)
+BASE_URL = os.environ["LAMBDA_BASE_URL"]
 
+def run_valid_call(method, id=1):
+    request_start = time.perf_counter()
 
-def main() -> int:
-    endpoint = _resolve_endpoint()
-    response = requests.get(endpoint, timeout=30)
-    print(f"GET {endpoint} -> {response.status_code}")
+    if method == "GET":
+        endpoint = f"{BASE_URL}/bike"
+        endpoint += f"?id={id}"
+        response = requests.get(endpoint, timeout=30)
+
+    if method == "POST":
+        endpoint = f"{BASE_URL}/bike/new"
+        bike = BikeDTO(make="orbea", model="orca", style="FIXIE")
+        response = requests.post(endpoint, json=bike.model_dump(), timeout=30)
+
+    if method == "PUT":
+        endpoint = f"{BASE_URL}/bike"
+        endpoint += f"?id={id}"
+        bike = BikeDTO(make="orbea", model="orca "+str(random.random()), style="FIXIE")
+        response = requests.put(endpoint, json=bike.model_dump(), timeout=30)
+
+    request_elapsed = time.perf_counter() - request_start
+    print(f"{method} {endpoint} -> {response.status_code}")
     print(response.text)
-    bike_payload = {
-        "brand": "All-City",
-        "color": "navy",
-        "model": "Space Horse",
-        "year": 2022,
-    }
-    response = requests.post(endpoint, json=bike_payload, timeout=30)
-    print(f"POST {endpoint} -> {response.status_code}")
-    print(response.text)
-    return 0
+    print(f"{method} took {request_elapsed:.3f}s")
+    data = json.loads(response.text)
+    return data
 
+def run_invalid_call(method):
+    request_start = time.perf_counter()
+    if method == "GET":
+        endpoint = f"{BASE_URL}/bike"
+        response = requests.get(endpoint, timeout=30)
+    if method == "POST":
+        json = {"weird":2}
+        endpoint = f"{BASE_URL}/bike/new"
+        response = requests.post(endpoint, json=json, timeout=30)
+    if method == "PUT":
+        endpoint = f"{BASE_URL}/bike"
+        json = {"weird":2}
+        response = requests.put(endpoint, json=json, timeout=30)        
+    request_elapsed = time.perf_counter() - request_start
+    print(f"{method} {endpoint} -> {response.status_code}")
+    print(response.text)
+    print(f"{method} took {request_elapsed:.3f}s")
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    data = run_valid_call("POST")
+    if "id" in data:
+        bike_id = data["id"]
+        run_valid_call("GET", id=bike_id)
+        run_valid_call("PUT", id=bike_id)
+
+    run_invalid_call("GET")
+    run_invalid_call("POST")
+
