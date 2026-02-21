@@ -8,25 +8,12 @@ from src.api_gateway_schema.external_schema import BikeDTO
 from src.main.lambdas.admin_lambda import admin_lambda
 from src.main.lambdas.bicycle_lambda import bicycle_lambda
 from src.main.lambdas.common.dynamo_schema import Bike
-from src.main.lambdas.common.logger import logger
 from src.test.test_util.api_gateway_event import APIGatewayTestEvent
 from src.test.test_util.dynamodb import LocalDynamoManager
 
 TITLE = "Lambda API Schema"
-DESCRIPTION = """
-
-Interactive tester:
- - Test Lambda core functionality
- - Generate JSON Schema generates that API Gateway will use.
- - In summary, even though this lives in the 'test' directory, the generated json schema is actually PRODUCTION code. 
-
-Explaining why:
- - This project aims to have very lightweight lambdas with almost instant
-start up time (even when cold)!.
- - To do so, we constrict the lambdas to only do simple db operations
-and business logic validations.
- - All syntax validation will be performed by API Gateway, using this json schema.
-"""
+DESCRIPTION = "Defining API schema that is validated by AWS API Gateway"
+## Note: This is used to test lambda functions locally with API Gateway-like events
 
 bicycle_lambda_router = APIRouter(tags=["bicycle lambdas"])
 
