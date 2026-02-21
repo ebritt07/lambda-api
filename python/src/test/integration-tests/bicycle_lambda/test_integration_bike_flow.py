@@ -51,7 +51,7 @@ def test_bike_crud_flow_in_order(client):
     assert "id" in created_bike
     bike_id = created_bike["id"]
 
-    response = client.get(f"/bike/{bike_id}")
+    response = client.get("/bike", params={"id": bike_id})
     assert response.status_code == 200
     fetched_bike = response.json()
     assert fetched_bike["id"] == bike_id
@@ -63,18 +63,18 @@ def test_bike_crud_flow_in_order(client):
         "notes": "updated build",
     }
 
-    response = client.put(f"/bike/{bike_id}", json=update_payload)
+    response = client.put("/bike", params={"id": bike_id}, json=update_payload)
     assert response.status_code == 200
     updated_bike = response.json()
     assert updated_bike["id"] == bike_id
     assert updated_bike["model"] == update_payload["model"]
 
-    response = client.get(f"/bike/{bike_id}")
+    response = client.get("/bike", params={"id": bike_id})
     assert response.status_code == 200
     fetched_after_update = response.json()
     assert fetched_after_update["model"] == update_payload["model"]
 
-    response = client.delete(f"/bike/{bike_id}")
+    response = client.delete("/bike", params={"id": bike_id})
     assert response.status_code == 204
 
 
@@ -82,7 +82,7 @@ def test_bike_crud_flow_in_order(client):
 def test_bike_get_put_missing_returns_404(client):
     missing_id = "missing-id-123"
 
-    response = client.get(f"/bike/{missing_id}")
+    response = client.get("/bike", params={"id": missing_id})
     assert response.status_code == 404
 
     update_payload = {
@@ -92,5 +92,5 @@ def test_bike_get_put_missing_returns_404(client):
         "notes": "should fail",
     }
 
-    response = client.put(f"/bike/{missing_id}", json=update_payload)
+    response = client.put("/bike", params={"id": missing_id}, json=update_payload)
     assert response.status_code == 404
