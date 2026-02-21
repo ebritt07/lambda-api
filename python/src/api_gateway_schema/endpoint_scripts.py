@@ -52,14 +52,21 @@ def run_invalid_call(method):
     print(f"{method} {endpoint} -> {response.status_code}")
     print(response.text)
     print(f"{method} took {request_elapsed:.3f}s")
+    return response
 
 if __name__ == "__main__":
     data = run_valid_call("POST")
-    if "id" in data:
-        bike_id = data["id"]
-        run_valid_call("GET", id=bike_id)
-        run_valid_call("PUT", id=bike_id)
+    assert "id" in data, "POST response should contain id"
+    bike_model = data["model"]
+    assert bike_model.startswith("orca"), "POST response should contain correct model"
+    bike_id = data["id"]
+    data = run_valid_call("GET", id=bike_id)
+    assert data["model"] == bike_model, "GET response should contain correct model"
+    data = run_valid_call("PUT", id=bike_id)
+    assert data["model"] != bike_model, "PUT response should update model"
 
-    run_invalid_call("GET")
+    response = run_invalid_call("GET")
+    assert response.status_code == 400, "GET without id should return 400"
     run_invalid_call("POST")
+    assert response.status_code == 400, "POST with invalid body should return 400"
 
