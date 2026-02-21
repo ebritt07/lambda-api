@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.main.api_gateway_schema.external_schema import BikeDTO
+from src.api_gateway_schema.external_schema import BikeDTO
 
 
 def test_bike_dto_accepts_valid_style_enum_value():

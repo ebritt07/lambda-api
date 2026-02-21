@@ -39,21 +39,21 @@
   - `terraform/backend-setup/`
 
 ## Tests Instructions
-- Run from `python/`
 - Before either test suite:
   - Activate the Python 3.13 venv: `source .venv/bin/activate`
   - Install test deps: `python -m pip install -r requirements-test.txt`
-- Local tests:
+- Unit tests:
+  - Run from `python/`
   - `pytest`
 -  Integration tests (needs docker):
-  - `docker build -f Dockerfile.integration -t lambda-api-integration .`
-  - `docker run --rm lambda-api-integration`
-- Default for small changes: run local `pytest` only (no Docker integration)
-- Do not run Docker integration on every change; reserve it for pre-PR verification
-- Before submitting a PR: run Docker integration test
+  - Run from project root
+  - `docker build -f Dockerfile.testSuite -t lambda-api-testSuite .`
+  - `docker run --rm lambda-api-testSuite`
+- Default for small changes: run unit tests only (no Docker testSuite)
+- Do not run Docker testSuite on every change; reserve it for pre-PR verification
+- Before submitting a PR: run Docker integration test suite
   
 ## PR Description Format
-- Use plain text only. No headings, bullets, or fancy formatting.
 - Include two labeled lines:
   - Summary: description of the change
   - Testing: describe what you ran, not the exact command
