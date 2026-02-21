@@ -12,7 +12,7 @@ table = ddb.dynamodb.Table(Table.BIKES)
 
 
 def handler(event, context):
-    method = event["requestContext"]["http"]["method"]
+    method = event["httpMethod"]
 
     if method == "GET":
         response = table.get_item(Key={

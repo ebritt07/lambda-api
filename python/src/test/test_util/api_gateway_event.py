@@ -18,11 +18,10 @@ class APIGatewayTestEvent:
                 "content-type": "application/json",
                 "x-forwarded-proto": "https"
             },
+            "httpMethod": self.method,
             "queryStringParameters": self.query_params,
             "requestContext": {
-                "http": {
-                    "method": self.method,
-                },
+
                 "time": "07/Feb/2026:07:01:11 +0000",
                 "timeEpoch": 1770447671652
             },
