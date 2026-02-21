@@ -20,8 +20,8 @@ variable "zip_output_dir" {
   type    = string
 }
 
-variable "dynamodb_table_arn" {
-  type = string
+variable "dynamodb_table_arns" {
+  type = list(string)
 }
 
 variable "memory_size" {

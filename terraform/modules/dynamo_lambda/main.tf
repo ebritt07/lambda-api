@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "dynamodb_access" {
       "dynamodb:UpdateItem"
     ]
 
-    resources = [var.dynamodb_table_arn]
+    resources = var.dynamodb_table_arns
   }
 }
 
