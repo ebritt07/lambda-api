@@ -34,12 +34,3 @@ class DynamoDbClient:
             response = table.scan(Limit=3)
             previews[table_name] = response.get("Items", [])
         return previews
-
-    def get_item_from_table(self, key: str, table_name: Table):
-        response = self.dynamodb.get_item(
-            TableName=table_name,
-            Key=key
-        )
-        if 'Item' in response:
-            return response['Item']
-        return {}
