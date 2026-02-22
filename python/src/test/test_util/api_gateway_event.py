@@ -8,6 +8,7 @@ class APIGatewayTestEvent:
     raw_path: str = ""
     query_params: dict = field(default_factory=dict)
     body_json_str: Optional[str] = None
+    authorizer_claims: Optional[dict] = None
 
     def export_event(self) -> dict:
         event = {
@@ -27,6 +28,8 @@ class APIGatewayTestEvent:
             },
             "isBase64Encoded": False
         }
+        if self.authorizer_claims:
+            event["requestContext"]["authorizer"] = {"claims": self.authorizer_claims}
         if self.body_json_str:
             event["body"] = self.body_json_str
         return event

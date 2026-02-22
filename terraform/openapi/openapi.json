@@ -56,6 +56,11 @@
                 ],
                 "summary": "Update Bike By Id",
                 "operationId": "update_bike_by_id_bike_put",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -115,6 +120,11 @@
                 ],
                 "summary": "Delete Bike By Id",
                 "operationId": "delete_bike_by_id_bike_delete",
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -199,7 +209,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "HTTPBearer": []
+                    }
+                ]
             }
         },
         "/admin/tables": {
@@ -239,6 +254,10 @@
                         "type": "string",
                         "title": "Style"
                     },
+                    "owner_id": {
+                        "type": "string",
+                        "title": "Owner Id"
+                    },
                     "notes": {
                         "anyOf": [
                             {
@@ -260,6 +279,7 @@
                     "make",
                     "model",
                     "style",
+                    "owner_id",
                     "notes"
                 ],
                 "title": "Bike"
@@ -353,6 +373,12 @@
                     "type"
                 ],
                 "title": "ValidationError"
+            }
+        },
+        "securitySchemes": {
+            "HTTPBearer": {
+                "type": "http",
+                "scheme": "bearer"
             }
         }
     }
