@@ -4,6 +4,7 @@ import "./HeaderSticker.css";
 interface Props {
   text: any;
   stickerType: StickerType;
+  href?: string;
 }
 
 export const StickerType = {
@@ -22,10 +23,21 @@ const StickerTypeColorMap = new Map([
 
 const HeaderSticker = (props: Props) => {
   const backgroundColor = StickerTypeColorMap.get(props.stickerType);
+
+  const handleClick = () => {
+    if (!props.href) {
+      return;
+    }
+
+    window.open(props.href, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <button
+      type="button"
       className="header-sticker"
       style={{ backgroundColor: backgroundColor }}
+      onClick={handleClick}
     >
       {props.text}
     </button>

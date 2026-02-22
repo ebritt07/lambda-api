@@ -19,6 +19,9 @@
 - Local dev/test harness (FastAPI): `python/src/test/main.py`
 - Tests + local DynamoDB helpers: `python/src/test/`
 - Infra (Terraform): `terraform/` (with env vars under `terraform/env/`)
+- UI (Vite + React): `typescript/`
+  - Header build label reads `VITE_BUILD_BRANCH` + `VITE_PIPELINE_NUMBER` (fallback `development`)
+  - Header sticker links to pipeline run when `VITE_GITHUB_REPOSITORY` + `VITE_PIPELINE_RUN_ID` are set (`VITE_GITHUB_BASE_URL` defaults to `https://github.com`)
 
 ## Tight Couplings (Important)
 - Terraform defines DynamoDB tables and their keys/GSIs.
