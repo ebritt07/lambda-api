@@ -30,9 +30,7 @@ def handler(event, context):
         if not response.get("Item"):
             return api_response({"message": "Bike not found"}, status_code=404)
 
-        body = event["body"]
-        if isinstance(body, str):
-            body = json.loads(body)
+        body = json.loads(event["body"])
         bike_data = dict(body)
         bike_data["id"] = bike_id
         bike = Bike(**bike_data)
@@ -48,12 +46,9 @@ def handler(event, context):
 
         table.delete_item(Key={"id": bike_id})
         logger.info("deleted bike id {}".format(bike_id))
-        logger.info(bike_id)
         return api_response(None, status_code=204)
 
-    body = event["body"]
-    if isinstance(body, str):
-        body = json.loads(body)
+    body = json.loads(event["body"])
     bike = Bike(**body)
     bike_dict = asdict(bike)
     table.put_item(
