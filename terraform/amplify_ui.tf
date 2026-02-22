@@ -4,10 +4,9 @@ resource "aws_amplify_app" "frontend" {
 }
 
 resource "aws_amplify_branch" "frontend_main" {
-  app_id                   = aws_amplify_app.frontend.id
-  branch_name              = "main"
-  enable_auto_build        = false
-  enable_branch_auto_build = false
+  app_id            = aws_amplify_app.frontend.id
+  branch_name       = "main"
+  enable_auto_build = false
 }
 
 resource "aws_amplify_domain_association" "frontend" {
