@@ -33,6 +33,7 @@ resource "null_resource" "trigger_manual_deploy" {
   }
 
   depends_on = [
-    aws_s3_object.frontend_dist_files
+    aws_s3_object.frontend_dist_files,
+    aws_s3_bucket_policy.frontend_artifacts_amplify_read
   ]
 }
