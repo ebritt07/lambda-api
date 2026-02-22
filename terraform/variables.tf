@@ -22,3 +22,8 @@ variable "root_domain_certificate_arn" {
   type    = string
   default = ""
 }
+
+variable "cognito_user_pool_arn" {
+  type    = string
+  default = ""
+}

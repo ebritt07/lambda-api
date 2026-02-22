@@ -42,6 +42,26 @@ locals {
 
   api_gateway_http_methods = ["get", "put", "post", "delete", "patch", "head", "options"]
 
+  api_gateway_components = lookup(local.api_gateway_contract, "components", {})
+
+  api_gateway_security_schemes = lookup(local.api_gateway_components, "securitySchemes", {})
+
+  api_gateway_authorized_security_schemes = var.cognito_user_pool_arn == "" ? local.api_gateway_security_schemes : merge(
+    local.api_gateway_security_schemes,
+    {
+      HTTPBearer = merge(
+        lookup(local.api_gateway_security_schemes, "HTTPBearer", {}),
+        {
+          "x-amazon-apigateway-authtype" = "cognito_user_pools"
+          "x-amazon-apigateway-authorizer" = {
+            type         = "cognito_user_pools"
+            providerARNs = [var.cognito_user_pool_arn]
+          }
+        }
+      )
+    }
+  )
+
   api_gateway_paths_with_integration = {
     for path_name, path_item in local.api_gateway_contract.paths :
     path_name => merge(
@@ -79,7 +99,12 @@ locals {
       version = "1.0.0"
     }
     paths      = local.api_gateway_paths_with_integration
-    components = lookup(local.api_gateway_contract, "components", {})
+    components = merge(
+      local.api_gateway_components,
+      {
+        securitySchemes = local.api_gateway_authorized_security_schemes
+      }
+    )
     "x-amazon-apigateway-request-validators" = {
       strict = {
         validateRequestBody       = true
