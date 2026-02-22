@@ -1,10 +1,4 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "Lambda API Schema",
-        "description": "Defining API schema that is validated by AWS API Gateway",
-        "version": "0.1.0"
-    },
     "paths": {
         "/bike": {
             "get": {
