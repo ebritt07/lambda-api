@@ -1,5 +1,5 @@
 locals {
-  org_name                 = "ebritt07"
+  org_name                  = "ebritt07"
   frontend_source_directory = abspath("${path.root}/${var.frontend_source_directory}")
   frontend_dist_files       = fileset(local.frontend_source_directory, "**")
   frontend_dist_etag_hash = sha1(join("", [
