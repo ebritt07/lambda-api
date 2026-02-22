@@ -1,6 +1,11 @@
 locals {
   org_name                 = "ebritt07"
   frontend_source_directory = abspath("${path.root}/${var.frontend_source_directory}")
+  frontend_dist_files       = fileset(local.frontend_source_directory, "**")
+  frontend_dist_etag_hash = sha1(join("", [
+    for file in sort(local.frontend_dist_files) :
+    filemd5("${local.frontend_source_directory}/${file}")
+  ]))
 }
 
 resource "aws_s3_bucket" "frontend_artifacts" {
@@ -17,7 +22,7 @@ resource "aws_s3_bucket_public_access_block" "frontend_artifacts" {
 }
 
 resource "aws_s3_object" "frontend_dist_files" {
-  for_each = fileset(local.frontend_source_directory, "**")
+  for_each = local.frontend_dist_files
 
   bucket = aws_s3_bucket.frontend_artifacts.id
   key    = each.value
