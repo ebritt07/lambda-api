@@ -64,7 +64,7 @@ def handler(event, context):
             return api_response({"message": "Forbidden"}, status_code=403)
 
         table.delete_item(Key={"id": bike_id})
-        logger.info("deleted bike id {}".format(bike_id))
+        logger.info(f"deleted bike id {bike_id}")
         return api_response(None, status_code=204)
 
     caller_sub = get_caller_sub(event)
