@@ -46,9 +46,9 @@ locals {
 
   api_gateway_security_schemes = lookup(local.api_gateway_components, "securitySchemes", {})
 
-  api_gateway_authorized_security_schemes = var.cognito_user_pool_arn == "" ? local.api_gateway_security_schemes : merge(
+  api_gateway_authorized_security_schemes = merge(
     local.api_gateway_security_schemes,
-    {
+    var.cognito_user_pool_arn == "" ? {} : {
       HTTPBearer = merge(
         lookup(local.api_gateway_security_schemes, "HTTPBearer", {}),
         {
