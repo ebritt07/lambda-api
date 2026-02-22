@@ -91,8 +91,9 @@ locals {
 }
 
 resource "aws_api_gateway_rest_api" "lambda_collection" {
-  name = var.api_gateway_name
-  body = jsonencode(local.api_gateway_openapi_document)
+  name                        = var.api_gateway_name
+  body                        = jsonencode(local.api_gateway_openapi_document)
+  disable_execute_api_endpoint = true
 
   endpoint_configuration {
     types = ["REGIONAL"]
