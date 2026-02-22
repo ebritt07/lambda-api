@@ -25,6 +25,27 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "typescript/package-lock.json"
+
+      - name: Build frontend dist
+        working-directory: ./typescript
+        run: |
+          npm ci
+          npm run build
+
+      - name: Zip frontend dist artifact
+        run: |
+          mkdir -p ./terraform/${{ env.zip_artifacts }}
+          rm -f ./terraform/${{ env.zip_artifacts }}/frontend-dist.zip
+          cd ./typescript/dist
+          zip -r ../../terraform/${{ env.zip_artifacts }}/frontend-dist.zip .
+
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -72,6 +93,26 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "typescript/package-lock.json"
+
+      - name: Build frontend dist
+        working-directory: ./typescript
+        run: |
+          npm ci
+          npm run build
+
+      - name: Zip frontend dist artifact
+        run: |
+          mkdir -p ./terraform/${{ env.zip_artifacts }}
+          rm -f ./terraform/${{ env.zip_artifacts }}/frontend-dist.zip
+          cd ./typescript/dist
+          zip -r ../../terraform/${{ env.zip_artifacts }}/frontend-dist.zip .
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v6
