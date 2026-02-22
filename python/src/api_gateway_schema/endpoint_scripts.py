@@ -7,7 +7,7 @@ import requests
 
 from src.api_gateway_schema.external_schema import BikeDTO
 
-BASE_URL = os.environ["LAMBDA_BASE_URL"]
+BASE_URL = os.environ.get("BASE_URL", "https://api.ebritt07.click")
 
 def run_valid_call(method, id=1):
     request_start = time.perf_counter()

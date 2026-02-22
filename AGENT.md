@@ -47,10 +47,10 @@
   - `pytest`
 -  Integration tests (needs docker):
   - Run from project root
-  - `docker build -f Dockerfile.testSuite -t lambda-api-testSuite .`
-  - `docker run --rm lambda-api-testSuite`
-- Default for small changes: run unit tests only (no Docker testSuite)
-- Do not run Docker testSuite on every change; reserve it for pre-PR verification
+  - `docker build -f Dockerfile.testsuite -t lambda-api-testsuite .`
+  - `docker run --rm lambda-api-testsuite`
+- Default for small changes: run unit tests only (no Docker testsuite)
+- Do not run Docker testsuite on every change; reserve it for pre-PR verification
 - Before submitting a PR: run Docker integration test suite
   
 ## PR Description Format

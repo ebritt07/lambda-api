@@ -17,5 +17,6 @@ class Bike:
     make: str
     model: str
     style: str
+    owner_id: str
     notes: Optional[str]
     id: str = field(default_factory=lambda: str(uuid.uuid4()))

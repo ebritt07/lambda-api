@@ -1,7 +1,7 @@
 import logging
 from logging import Formatter
 
-logger = logging.getLogger('evo-sim')
+logger = logging.getLogger('ebritt-lambda')
 logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
