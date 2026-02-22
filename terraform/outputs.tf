@@ -17,3 +17,11 @@ output "api_gateway_custom_domain_name" {
 output "api_gateway_custom_domain_invoke_url" {
   value = "https://${aws_api_gateway_domain_name.lambda_collection.domain_name}"
 }
+
+output "frontend_artifacts_bucket_name" {
+  value = aws_s3_bucket.frontend_artifacts.bucket
+}
+
+output "frontend_dist_entrypoint_s3_key" {
+  value = "index.html"
+}

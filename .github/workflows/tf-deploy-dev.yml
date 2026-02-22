@@ -2,7 +2,6 @@ name: tf-deploy-dev
 env:
   environment: dev
   terraform_version: 1.6.6
-  zip_artifacts: zip_artifacts
 
 permissions:
   id-token: write
@@ -16,7 +15,7 @@ on:
 
 jobs:
 
-  tf-plan:
+  tf-deploy-dev:
     runs-on: ubuntu-latest
     environment: dev
     defaults:
@@ -25,6 +24,20 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: "typescript/package-lock.json"
+
+      - name: Build frontend dist
+        working-directory: ./typescript
+        run: |
+          npm ci
+          npm run build
+
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -55,50 +68,6 @@ jobs:
       - name: list directories
         run: ls -R .
 
-      - name: Upload Zip Artifacts
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ env.zip_artifacts }}
-          path: ./terraform/${{ env.zip_artifacts }}/
-
-  tf-apply:
-    needs: [tf-plan]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./terraform
-    environment: dev
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v6
-
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          role-session-name: GitHub_to_AWS_via_FederatedOIDC
-          aws-region: us-east-1
-
-      - name: Download Plan Artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: tfplan
-          path: ./terraform
-
-      - name: Download Zip Artifacts
-        uses: actions/download-artifact@v7
-        with:
-          name: ${{env.zip_artifacts}}
-          path: ./terraform/${{env.zip_artifacts}}/
-
-      - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.terraform_version }}
-
-      - name: Terraform Init
-        run: terraform init
-
       - name: Terraform Apply
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         run: terraform apply -auto-approve tfplan
