@@ -20,14 +20,6 @@ const getBuildLabel = (): string => {
     return `${branch}-${pipelineNumber}`;
   }
 
-  if (branch) {
-    return branch;
-  }
-
-  if (pipelineNumber) {
-    return `pipeline ${pipelineNumber}`;
-  }
-
   return "development";
 };
 
