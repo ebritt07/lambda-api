@@ -34,6 +34,12 @@ jobs:
 
       - name: Build frontend dist
         working-directory: ./typescript
+        env:
+          VITE_BUILD_BRANCH: ${{ github.head_ref || github.ref_name }}
+          VITE_PIPELINE_NUMBER: ${{ github.run_number }}
+          VITE_GITHUB_BASE_URL: ${{ github.server_url }}
+          VITE_GITHUB_REPOSITORY: ${{ github.repository }}
+          VITE_PIPELINE_RUN_ID: ${{ github.run_id }}
         run: |
           npm ci
           npm run build
