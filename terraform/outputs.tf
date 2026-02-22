@@ -25,11 +25,3 @@ output "frontend_artifacts_bucket_name" {
 output "frontend_dist_entrypoint_s3_key" {
   value = "index.html"
 }
-
-output "amplify_frontend_app_id" {
-  value = aws_amplify_app.frontend.id
-}
-
-output "amplify_frontend_default_domain" {
-  value = aws_amplify_app.frontend.default_domain
-}
