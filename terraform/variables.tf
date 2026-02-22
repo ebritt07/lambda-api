@@ -28,8 +28,3 @@ variable "root_domain_certificate_arn" {
   type    = string
   default = ""
 }
-
-variable "local_domain_name" {
-  type    = string
-  default = ""
-}

@@ -11,10 +11,10 @@ resource "aws_amplify_branch" "frontend_main" {
 }
 
 resource "aws_amplify_domain_association" "frontend" {
-  count = var.local_domain_name != "" ? 1 : 0
+  count = var.root_domain_name != "" ? 1 : 0
 
   app_id      = aws_amplify_app.frontend.id
-  domain_name = var.local_domain_name
+  domain_name = var.root_domain_name
 
   sub_domain {
     branch_name = aws_amplify_branch.frontend_main.branch_name
