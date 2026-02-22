@@ -45,17 +45,18 @@ locals {
   api_gateway_components = lookup(local.api_gateway_contract, "components", {})
 
   api_gateway_security_schemes = lookup(local.api_gateway_components, "securitySchemes", {})
+  cognito_user_pool_arn        = "arn:aws:cognito-idp:us-east-1:862315107606:userpool/us-east-1_0ZYPyfZRg"
 
   api_gateway_authorized_security_schemes = merge(
     local.api_gateway_security_schemes,
-    var.cognito_user_pool_arn == "" ? {} : {
+    local.cognito_user_pool_arn == "" ? {} : {
       HTTPBearer = merge(
         lookup(local.api_gateway_security_schemes, "HTTPBearer", {}),
         {
           "x-amazon-apigateway-authtype" = "cognito_user_pools"
           "x-amazon-apigateway-authorizer" = {
             type         = "cognito_user_pools"
-            providerARNs = [var.cognito_user_pool_arn]
+            providerARNs = [local.cognito_user_pool_arn]
           }
         }
       )
