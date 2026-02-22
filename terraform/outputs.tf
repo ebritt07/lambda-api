@@ -22,6 +22,6 @@ output "frontend_artifacts_bucket_name" {
   value = aws_s3_bucket.frontend_artifacts.bucket
 }
 
-output "frontend_dist_zip_s3_key" {
-  value = aws_s3_object.frontend_dist_zip.key
+output "frontend_dist_entrypoint_s3_key" {
+  value = "index.html"
 }
