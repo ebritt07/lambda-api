@@ -45,7 +45,7 @@ def handler(event, context):
             return api_response({"message": "Bike not found"}, status_code=404)
 
         table.delete_item(Key={"id": bike_id})
-        logger.info("deleted bike id {}".format(bike_id))
+        logger.info(f"deleted bike id {bike_id}")
         return api_response(None, status_code=204)
 
     body = json.loads(event["body"])
