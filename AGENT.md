@@ -22,6 +22,8 @@
 - UI (Vite + React): `typescript/`
   - Header build label reads `VITE_BUILD_BRANCH` + `VITE_PIPELINE_NUMBER` (fallback `development`)
   - Header sticker links to pipeline run when `VITE_GITHUB_REPOSITORY` + `VITE_PIPELINE_RUN_ID` are set (`VITE_GITHUB_BASE_URL` defaults to `https://github.com`)
+  - Sign-in uses `react-oidc-context` config in `typescript/src/auth/cognitoConfig.ts` (Cognito code flow)
+  - Redirect/logout URI: `http://localhost:5173/` for `development` builds, otherwise `https://ebritt07.click`
 
 ## Tight Couplings (Important)
 - Terraform defines DynamoDB tables and their keys/GSIs.
