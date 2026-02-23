@@ -13,3 +13,9 @@ A quick website demonstration using Vite. It's quite easy to get going!
   - `VITE_GITHUB_BASE_URL="https://github.com" VITE_GITHUB_REPOSITORY="owner/repo" VITE_PIPELINE_RUN_ID="567890"`
 - `npm run preview`
   - serves from the /dist folder
+
+### Sign-in configuration
+- Sign-in uses `react-oidc-context` with Cognito config in `src/auth/cognitoConfig.ts`.
+- `redirect_uri` and logout URI switch automatically:
+  - `development` build label -> `http://localhost:5173/`
+  - non-development build label -> `https://ebritt07.click`

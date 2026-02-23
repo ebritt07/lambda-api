@@ -1,4 +1,5 @@
 import HeaderSticker, { StickerType } from "./HeaderSticker";
+import { getBuildLabel } from "../../config/buildInfo";
 
 const getPipelineUrl = (): string | undefined => {
   const baseUrl = import.meta.env.VITE_GITHUB_BASE_URL?.trim() || "https://github.com";
@@ -10,17 +11,6 @@ const getPipelineUrl = (): string | undefined => {
   }
 
   return `${baseUrl}/${repository}/actions/runs/${runId}`;
-};
-
-const getBuildLabel = (): string => {
-  const branch = import.meta.env.VITE_BUILD_BRANCH?.trim();
-  const pipelineNumber = import.meta.env.VITE_PIPELINE_NUMBER?.trim();
-
-  if (branch && pipelineNumber) {
-    return `${branch}-${pipelineNumber}`;
-  }
-
-  return "development";
 };
 
 const Header = () => {
