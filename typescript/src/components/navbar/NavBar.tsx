@@ -59,7 +59,7 @@ const Navbar = (props: Props) => {
       <div className="nav-panel">
         <div>
 
-          <h5><i style={{ paddingLeft: "30px" }}>{props.isAuthenticated ? resolvedUserLabel : "@username"}</i></h5>
+          <h5><i style={{ paddingLeft: "30px" }}>{props.isAuthenticated ? `@${resolvedUserLabel}` : "@username"}</i></h5>
         </div>
 
         <NavBarGroup

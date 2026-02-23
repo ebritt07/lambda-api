@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 import type { User } from "oidc-client-ts";
-import { isDevelopmentBuild } from "../../config/buildInfo";
-import { useEffect } from "react";
 import {
   type ColumnDef,
   flexRender,
@@ -51,7 +49,6 @@ interface UserFieldRow {
 
 const UserView = ({ isAuthenticated, user, onSignIn, onSignOut }: Props) => {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
-  const developmentBuild = isDevelopmentBuild();
   const userRows = useMemo<UserFieldRow[]>(
     () => [
       { field: "Username", value: getProfileTextValue(user, "cognito:username") },
@@ -76,12 +73,6 @@ const UserView = ({ isAuthenticated, user, onSignIn, onSignOut }: Props) => {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
-  useEffect(() => {
-    if (user) {
-      console.log("profile user object", user);
-    }
-  }, [user]);
 
   const handleCopyToken = async () => {
     if (!user?.access_token) {
@@ -135,7 +126,7 @@ const UserView = ({ isAuthenticated, user, onSignIn, onSignOut }: Props) => {
           </table>
         </div>
       ) : null}
-      {developmentBuild && isAuthenticated ? (
+      {isAuthenticated ? (
         <p>
           <button type="button" onClick={() => { void handleCopyToken(); }}>
             Copy Access Token
