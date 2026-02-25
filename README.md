@@ -1,6 +1,11 @@
 ## lamba-api
 
-lambda + api + dynamo db app, and aws infra deployment
+lambda + api gateway + cognito + dynamo db app, deployed using terraform in GH actions.
+- it's my first e2e project using AI assistants.
+- it's serverless so it doesn't run up any bills
+- lambda functions have no external dependencies, so it's fast even in cold start.
+
+webite available on https://ebritt07.click.
 
 ### setup dynamodb local
 set up the local dynamo db runner so it can be booted up by the pythontest app
