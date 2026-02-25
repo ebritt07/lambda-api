@@ -54,6 +54,7 @@
   - Run from project root
   - `docker build -f Dockerfile.testsuite -t lambda-api-testsuite .`
   - `docker run --rm lambda-api-testsuite`
+  - During Docker test runs, avoid posting intermediate command output/status commentary until the run completes (pass/fail summary after completion only)
 - Default for small changes: run unit tests only (no Docker testsuite)
 - Do not run Docker testsuite on every change; reserve it for pre-PR verification
 - Before submitting a PR: run Docker integration test suite
