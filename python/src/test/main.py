@@ -1,7 +1,8 @@
 import os
 import uvicorn
 import json
-from fastapi import FastAPI, APIRouter, Query
+import base64
+from fastapi import FastAPI, APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 
 from src.api_gateway_schema.external_schema import BikeDTO
@@ -16,7 +17,6 @@ DESCRIPTION = "Defining API schema that is validated by AWS API Gateway"
 # Note: This is used to test lambda functions locally with API Gateway-like events
 
 bicycle_lambda_router = APIRouter(tags=["bicycle lambdas"])
-LOCAL_TEST_CLAIMS = {"sub": "local-test-user"}
 
 
 def _unwrap_api_response(response):
@@ -30,6 +30,28 @@ def _unwrap_api_response(response):
     return response
 
 
+def _extract_claims_from_auth_header(request: Request) -> dict | None:
+    auth_header = request.headers.get("authorization")
+    if not auth_header or not auth_header.lower().startswith("bearer "):
+        return None
+
+    token = auth_header.split(" ", 1)[1]
+    parts = token.split(".")
+    if len(parts) != 3:
+        return None
+
+    payload_segment = parts[1]
+    padded_payload = payload_segment + "=" * (-len(payload_segment) % 4)
+
+    try:
+        payload_bytes = base64.urlsafe_b64decode(padded_payload)
+        claims = json.loads(payload_bytes.decode("utf-8"))
+    except Exception:
+        return None
+
+    return claims if isinstance(claims, dict) else None
+
+
 @bicycle_lambda_router.get("", name="get bike by id")
 async def get_bike(id: str = Query(...)) -> Bike | dict:
     api_data = APIGatewayTestEvent(method="GET", query_params={"id": id})
@@ -39,6 +61,7 @@ async def get_bike(id: str = Query(...)) -> Bike | dict:
 
 @bicycle_lambda_router.put("", name="update bike by id")
 async def update_bike(
+        request: Request,
         id: str = Query(...),
         bike_dto: BikeDTO = ...,
 ) -> Bike | dict:
@@ -46,7 +69,7 @@ async def update_bike(
         method="PUT",
         query_params={"id": id},
         body_json_str=bike_dto.model_dump_json(),
-        authorizer_claims=LOCAL_TEST_CLAIMS,
+        authorizer_claims=_extract_claims_from_auth_header(request),
     )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
@@ -54,12 +77,13 @@ async def update_bike(
 
 @bicycle_lambda_router.delete("", name="delete bike by id")
 async def delete_bike(
+        request: Request,
         id: str = Query(...),
 ) -> dict:
     api_data = APIGatewayTestEvent(
         method="DELETE",
         query_params={"id": id},
-        authorizer_claims=LOCAL_TEST_CLAIMS,
+        authorizer_claims=_extract_claims_from_auth_header(request),
     )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
@@ -67,12 +91,13 @@ async def delete_bike(
 
 @bicycle_lambda_router.post("/new")
 async def save_bike(
+        request: Request,
         bike_dto: BikeDTO,
 ) -> Bike | dict:
     api_data = APIGatewayTestEvent(
         method="POST",
         body_json_str=bike_dto.model_dump_json(),
-        authorizer_claims=LOCAL_TEST_CLAIMS,
+        authorizer_claims=_extract_claims_from_auth_header(request),
     )
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
