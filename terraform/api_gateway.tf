@@ -50,9 +50,12 @@ locals {
   api_gateway_authorized_security_schemes = merge(
     local.api_gateway_security_schemes,
     local.cognito_user_pool_arn == "" ? {} : {
-      HTTPBearer = merge(
-        lookup(local.api_gateway_security_schemes, "HTTPBearer", {}),
+      (local.cognito_authorizer_name) = merge(
+        lookup(local.api_gateway_security_schemes, local.cognito_authorizer_name, {}),
         {
+          "type"                         = "apiKey"
+          "name"                         = "Authorization"
+          "in"                           = "header"
           "x-amazon-apigateway-authtype" = "cognito_user_pools"
           "x-amazon-apigateway-authorizer" = {
             type         = "cognito_user_pools"
