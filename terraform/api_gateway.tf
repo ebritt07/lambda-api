@@ -45,7 +45,7 @@ locals {
   api_gateway_components = lookup(local.api_gateway_contract, "components", {})
 
   api_gateway_security_schemes = lookup(local.api_gateway_components, "securitySchemes", {})
-  cognito_user_pool_arn        = "arn:aws:cognito-idp:us-east-1:862315107606:userpool/us-east-1_0ZYPyfZRg"
+  cognito_user_pool_arn        = "arn:aws:cognito-idp:us-east-1:862315107606:userpool/us-east-1_6IDvYI8kL"
 
   api_gateway_authorized_security_schemes = merge(
     local.api_gateway_security_schemes,
