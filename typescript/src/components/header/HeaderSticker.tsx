@@ -1,8 +1,9 @@
+import type { ReactNode } from "react";
 import { ColorMap } from "../util/Colors";
 import "./HeaderSticker.css";
 
 interface Props {
-  text: any;
+  text: ReactNode;
   stickerType: StickerType;
   href?: string;
 }

@@ -8,9 +8,10 @@ function App() {
   const auth = useAuth();
   const { setAlert } = useAlert();
   const hasAttemptedSilentSignIn = useRef(false);
+  const { activeNavigator, error, isAuthenticated, isLoading, signinSilent } = auth;
 
   useEffect(() => {
-    const message = auth.error?.message;
+    const message = error?.message;
     if (!message) {
       setAlert(null);
       return;
@@ -21,7 +22,7 @@ function App() {
       return;
     }
 
-    if (auth.error) {
+    if (error) {
       setAlert({
         kind: "error",
         message: `Sign-in failed: ${message}`,
@@ -30,27 +31,27 @@ function App() {
     }
 
     setAlert(null);
-  }, [auth.error, setAlert]);
+  }, [error, setAlert]);
 
   useEffect(() => {
     if (hasAttemptedSilentSignIn.current) {
       return;
     }
 
-    if (auth.isLoading || auth.activeNavigator) {
+    if (isLoading || activeNavigator) {
       return;
     }
 
-    if (auth.error || auth.isAuthenticated) {
+    if (error || isAuthenticated) {
       hasAttemptedSilentSignIn.current = true;
       return;
     }
 
     hasAttemptedSilentSignIn.current = true;
-    void auth.signinSilent().catch(() => {
+    void signinSilent().catch(() => {
       // Expected when there is no existing Cognito session; UI stays signed-out.
     });
-  }, [auth.activeNavigator, auth.error, auth.isAuthenticated, auth.isLoading, auth.signinSilent]);
+  }, [activeNavigator, error, isAuthenticated, isLoading, signinSilent]);
 
 return (
       <div

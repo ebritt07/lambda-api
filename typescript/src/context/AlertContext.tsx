@@ -20,6 +20,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
   return <AlertContext.Provider value={value}>{children}</AlertContext.Provider>;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAlert = (): AlertContextValue => {
   const context = useContext(AlertContext);
   if (!context) {

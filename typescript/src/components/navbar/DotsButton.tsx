@@ -4,14 +4,14 @@ interface Props {
   show: boolean;
   showColor: string;
   hideColor: string;
-  handleClick: any;
+  handleClick: () => void;
   id: string;
 }
 
 const DotsButton = (props: Props) => {
 
   return (
-    <div className="xs-button left" id={props.id} onClick={(e) => props.handleClick(e)}>
+    <div className="xs-button left" id={props.id} onClick={props.handleClick}>
       <div
         className="dot"
         style={{
