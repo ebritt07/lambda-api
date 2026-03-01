@@ -5,7 +5,7 @@ import base64
 from fastapi import FastAPI, APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 
-from src.api_gateway_schema.external_schema import BikeDTO
+from src.api_gateway_schema.external_schema import BikeDTO, BikeListResponseDTO
 from src.main.lambdas.admin_lambda import admin_lambda
 from src.main.lambdas.bicycle_lambda import bicycle_lambda
 from src.main.lambdas.common.dynamo_schema import Bike
@@ -54,7 +54,20 @@ def _extract_claims_from_auth_header(request: Request) -> dict | None:
 
 @bicycle_lambda_router.get("", name="get bike by id")
 async def get_bike(id: str = Query(...)) -> Bike | dict:
-    api_data = APIGatewayTestEvent(method="GET", query_params={"id": id})
+    api_data = APIGatewayTestEvent(method="GET", raw_path="/bike", query_params={"id": id})
+    event = api_data.export_event()
+    return _unwrap_api_response(bicycle_lambda.handler(event, {}))
+
+
+@bicycle_lambda_router.get("/list", name="list bikes")
+async def list_bikes(
+        limit: int = Query(25, ge=1, le=100),
+        next_token: str | None = Query(None),
+) -> BikeListResponseDTO | dict:
+    query_params = {"limit": str(limit)}
+    if next_token is not None:
+        query_params["next_token"] = next_token
+    api_data = APIGatewayTestEvent(method="GET", raw_path="/bike/list", query_params=query_params)
     event = api_data.export_event()
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
@@ -67,6 +80,7 @@ async def update_bike(
 ) -> Bike | dict:
     api_data = APIGatewayTestEvent(
         method="PUT",
+        raw_path="/bike",
         query_params={"id": id},
         body_json_str=bike_dto.model_dump_json(),
         authorizer_claims=_extract_claims_from_auth_header(request),
@@ -82,6 +96,7 @@ async def delete_bike(
 ) -> dict:
     api_data = APIGatewayTestEvent(
         method="DELETE",
+        raw_path="/bike",
         query_params={"id": id},
         authorizer_claims=_extract_claims_from_auth_header(request),
     )
@@ -96,6 +111,7 @@ async def save_bike(
 ) -> Bike | dict:
     api_data = APIGatewayTestEvent(
         method="POST",
+        raw_path="/bike/new",
         body_json_str=bike_dto.model_dump_json(),
         authorizer_claims=_extract_claims_from_auth_header(request),
     )

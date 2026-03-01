@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 
 from src.test.main import app
 from src.test.test_util.dynamodb import LocalDynamoManager
+from src.main.lambdas.common.dynamo_db_client import DynamoDbClient, Table
 
 
 def _is_codex_env() -> bool:
@@ -22,6 +23,7 @@ def _is_codex_env() -> bool:
     )
 
 
+
 def _bearer_headers(sub: str) -> dict[str, str]:
     payload = {"sub": sub}
     payload_bytes = json.dumps(payload).encode("utf-8")
@@ -30,6 +32,14 @@ def _bearer_headers(sub: str) -> dict[str, str]:
     )
     token = f"header.{payload_segment}.signature"
     return {"Authorization": f"Bearer {token}"}
+
+
+def _clear_bikes_table():
+    ddb = DynamoDbClient()
+    bike_table = ddb.dynamodb.Table(Table.BIKES)
+    scan_response = bike_table.scan(ProjectionExpression="id")
+    for item in scan_response.get("Items", []):
+        bike_table.delete_item(Key={"id": item["id"]})
 
 
 @pytest.fixture(scope="session")
@@ -177,3 +187,59 @@ def test_bike_update_delete_forbidden_for_non_owner(client):
         headers=_bearer_headers("other-user"),
     )
     assert delete_response.status_code == 403
+
+
+@pytest.mark.skipif(
+    _is_codex_env(),
+    reason="DynamoDB Local cannot bind sockets in Codex environment",
+)
+def test_bike_list_scan_paginates_and_hides_owner_id(client):
+    _clear_bikes_table()
+
+    created_ids = set()
+    for i in range(3):
+        response = client.post(
+            "/bike/new",
+            json={
+                "make": f"ListTest-{i}",
+                "model": f"Model-{i}",
+                "style": "ROAD",
+                "notes": f"list-notes-{i}",
+            },
+            headers=_bearer_headers(f"user-{i}"),
+        )
+        assert response.status_code == 200
+        created_ids.add(response.json()["id"])
+
+    page_1 = client.get("/bike/list", params={"limit": 2})
+    assert page_1.status_code == 200
+    page_1_data = page_1.json()
+    assert page_1_data["count"] == 2
+    assert len(page_1_data["items"]) == 2
+    assert page_1_data["next_token"]
+    for item in page_1_data["items"]:
+        assert "owner_id" not in item
+
+    page_2 = client.get(
+        "/bike/list",
+        params={"limit": 2, "next_token": page_1_data["next_token"]},
+    )
+    assert page_2.status_code == 200
+    page_2_data = page_2.json()
+    assert page_2_data["count"] == 1
+    assert len(page_2_data["items"]) == 1
+    assert page_2_data["next_token"] is None
+    for item in page_2_data["items"]:
+        assert "owner_id" not in item
+
+    listed_ids = {item["id"] for item in page_1_data["items"] + page_2_data["items"]}
+    assert listed_ids == created_ids
+
+
+@pytest.mark.skipif(
+    _is_codex_env(),
+    reason="DynamoDB Local cannot bind sockets in Codex environment",
+)
+def test_bike_list_invalid_next_token_returns_400(client):
+    response = client.get("/bike/list", params={"next_token": "not-a-valid-token"})
+    assert response.status_code == 400

@@ -13,3 +13,17 @@ class BikeDTO(BaseModel):
     model: str
     style: BikeStyle
     notes: Optional[str] = None
+
+
+class BikeListItemDTO(BaseModel):
+    id: str
+    make: str
+    model: str
+    style: BikeStyle
+    notes: Optional[str] = None
+
+
+class BikeListResponseDTO(BaseModel):
+    items: list[BikeListItemDTO]
+    next_token: Optional[str] = None
+    count: int
