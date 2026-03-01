@@ -103,14 +103,13 @@ def handler(event, context):
 
         query_params = event.get("queryStringParameters") or {}
         bike_id = query_params.get("id")
-        if not bike_id:
-            return api_response({"message": "Missing required query parameter: id"}, status_code=400)
 
-        response = table.get_item(Key={
-            'id': bike_id
-        }
+        response = table.get_item(
+            Key={
+                "id": bike_id,
+            }
         )
-        item = response.get('Item')
+        item = response.get("Item")
         if not item:
             return api_response({"message": "Bike not found"}, status_code=404)
         return api_response(item)
