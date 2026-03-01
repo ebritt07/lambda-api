@@ -58,7 +58,9 @@
                 "operationId": "update_bike_by_id_bike_put",
                 "security": [
                     {
-                        "ebritt07-authorizer": ["ebritt07.click/bike.modify"]
+                        "ebritt07-authorizer": [
+                            "ebritt07.click/bike.modify"
+                        ]
                     }
                 ],
                 "parameters": [
@@ -122,7 +124,9 @@
                 "operationId": "delete_bike_by_id_bike_delete",
                 "security": [
                     {
-                        "ebritt07-authorizer": ["ebritt07.click/bike.modify"]
+                        "ebritt07-authorizer": [
+                            "ebritt07.click/bike.modify"
+                        ]
                     }
                 ],
                 "parameters": [
@@ -162,6 +166,76 @@
                 }
             }
         },
+        "/bike/list": {
+            "get": {
+                "tags": [
+                    "bicycle lambdas"
+                ],
+                "summary": "List Bikes",
+                "operationId": "list_bikes_bike_list_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "default": 25,
+                            "title": "Limit"
+                        }
+                    },
+                    {
+                        "name": "next_token",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Next Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BikeListResponseDTO"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    ],
+                                    "title": "Response List Bikes Bike List Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/bike/new": {
             "post": {
                 "tags": [
@@ -169,6 +243,13 @@
                 ],
                 "summary": "Save Bike",
                 "operationId": "save_bike_bike_new_post",
+                "security": [
+                    {
+                        "ebritt07-authorizer": [
+                            "ebritt07.click/bike.modify"
+                        ]
+                    }
+                ],
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -209,12 +290,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "ebritt07-authorizer": ["ebritt07.click/bike.modify"]
-                    }
-                ]
+                }
             }
         },
         "/admin/tables": {
@@ -316,6 +392,76 @@
                     "style"
                 ],
                 "title": "BikeDTO"
+            },
+            "BikeListItemDTO": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "title": "Id"
+                    },
+                    "make": {
+                        "type": "string",
+                        "title": "Make"
+                    },
+                    "model": {
+                        "type": "string",
+                        "title": "Model"
+                    },
+                    "style": {
+                        "$ref": "#/components/schemas/BikeStyle"
+                    },
+                    "notes": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Notes"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "make",
+                    "model",
+                    "style"
+                ],
+                "title": "BikeListItemDTO"
+            },
+            "BikeListResponseDTO": {
+                "properties": {
+                    "items": {
+                        "items": {
+                            "$ref": "#/components/schemas/BikeListItemDTO"
+                        },
+                        "type": "array",
+                        "title": "Items"
+                    },
+                    "next_token": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Next Token"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "title": "Count"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "items",
+                    "count"
+                ],
+                "title": "BikeListResponseDTO"
             },
             "BikeStyle": {
                 "type": "string",

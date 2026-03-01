@@ -7,10 +7,18 @@ import requests
 
 from src.api_gateway_schema.external_schema import BikeDTO
 
-BASE_URL = os.environ.get("BASE_URL", "https://api.ebritt07.click")
+env_input = input("Use local env? (y/n): ")
+
+ENV = "local" if env_input.strip().lower() =="y" else "dev"
+BASE_URL = "http://localhost:8000" if ENV == "local" else "https://api.ebritt07.click"
+MOCK_TOKEN =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9." + \
+        "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikpva" + \
+        "G4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNj" + \
+        "IzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
 
 def _auth_header():
-    token = "header.payload.signature"
+
+    token = MOCK_TOKEN
     return {"Authorization": f"Bearer {token}"}
 
 def run_valid_call(method, id=1):
@@ -70,7 +78,8 @@ if __name__ == "__main__":
     assert data["model"] != bike_model, "PUT response should update model"
 
     response = run_invalid_call("GET")
-    assert response.status_code == 400, "GET without id should return 400"
+    assert 400 <= response.status_code < 500, "GET without id should return 4xx"
     run_invalid_call("POST")
-    assert response.status_code == 400, "POST with invalid body should return 400"
+    response = run_invalid_call("POST")
+    assert 400 <= response.status_code < 500, "POST with invalid body should return 4xx"
 

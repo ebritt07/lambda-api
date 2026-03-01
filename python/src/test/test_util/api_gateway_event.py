@@ -13,6 +13,7 @@ class APIGatewayTestEvent:
     def export_event(self) -> dict:
         event = {
             "version": "2.0",
+            "rawPath": self.raw_path,
             "headers": {
                 "accept": "application/json",
                 "content-length": "100",
@@ -20,6 +21,7 @@ class APIGatewayTestEvent:
                 "x-forwarded-proto": "https"
             },
             "httpMethod": self.method,
+            "path": self.raw_path,
             "queryStringParameters": self.query_params,
             "requestContext": {
 
