@@ -1,5 +1,6 @@
 import HeaderSticker, { StickerType } from "./HeaderSticker";
 import { getBuildLabel } from "../../config/buildInfo";
+import { useAlert } from "../../context/AlertContext";
 
 const getPipelineUrl = (): string | undefined => {
   const baseUrl = import.meta.env.VITE_GITHUB_BASE_URL?.trim() || "https://github.com";
@@ -16,6 +17,7 @@ const getPipelineUrl = (): string | undefined => {
 const Header = () => {
   const buildLabel = getBuildLabel();
   const pipelineUrl = getPipelineUrl();
+  const { alert } = useAlert();
 
   return (
     <div className="header">
@@ -26,7 +28,12 @@ const Header = () => {
           stickerType={StickerType.Info}
           href={pipelineUrl}
         />
-        {/* Add a functionality to show alert when alert context is updated */}
+        {alert ? (
+          <HeaderSticker
+            text={alert.message}
+            stickerType={alert.kind === "error" ? StickerType.ErrorAlert : StickerType.SuccessAlert}
+          />
+        ) : null}
       </div>
     </div>
   );

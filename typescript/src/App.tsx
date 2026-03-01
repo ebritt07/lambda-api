@@ -1,23 +1,57 @@
 import { useAuth } from "react-oidc-context";
-import type { User } from "oidc-client-ts";
-import { buildCognitoSignOutUrl } from "./auth/cognitoConfig";
+import { useEffect, useRef } from "react";
+import { isExpectedSignedOutAuthError } from "./auth/authError";
+import { useAlert } from "./context/AlertContext";
 import Container from './components/Container';
 
 function App() {
   const auth = useAuth();
+  const { setAlert } = useAlert();
+  const hasAttemptedSilentSignIn = useRef(false);
+  const { activeNavigator, error, isAuthenticated, isLoading, signinSilent } = auth;
 
-  const handleSignIn = () => {
-    void auth.signinRedirect();
-  };
+  useEffect(() => {
+    const message = error?.message;
+    if (!message) {
+      setAlert(null);
+      return;
+    }
 
-  const handleSignOut = () => {
-    void auth.removeUser();
-    window.location.href = buildCognitoSignOutUrl();
-  };
+    if (isExpectedSignedOutAuthError(message)) {
+      setAlert(null);
+      return;
+    }
 
-  const user: User | null = auth.user ?? null;
-  const isAuthenticated = Boolean(auth.isAuthenticated && user);
-  const canSignIn = auth.activeNavigator === undefined && !auth.isLoading;
+    if (error) {
+      setAlert({
+        kind: "error",
+        message: `Sign-in failed: ${message}`,
+      });
+      return;
+    }
+
+    setAlert(null);
+  }, [error, setAlert]);
+
+  useEffect(() => {
+    if (hasAttemptedSilentSignIn.current) {
+      return;
+    }
+
+    if (isLoading || activeNavigator) {
+      return;
+    }
+
+    if (error || isAuthenticated) {
+      hasAttemptedSilentSignIn.current = true;
+      return;
+    }
+
+    hasAttemptedSilentSignIn.current = true;
+    void signinSilent().catch(() => {
+      // Expected when there is no existing Cognito session; UI stays signed-out.
+    });
+  }, [activeNavigator, error, isAuthenticated, isLoading, signinSilent]);
 
 return (
       <div
@@ -27,13 +61,7 @@ return (
           height: "100vh",
         }}
       >
-        <Container
-          isAuthenticated={isAuthenticated}
-          canSignIn={canSignIn}
-          user={user}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
-        />
+        <Container />
         
       </div>
   );

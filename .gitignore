@@ -25,3 +25,7 @@ python/src/test/runDynamoLocally/dynamodb-local-metadata.json
 .vscode/
 testing-results/
 python/testing-results/
+
+# macOS finder metadata
+.DS_Store
+**/.DS_Store

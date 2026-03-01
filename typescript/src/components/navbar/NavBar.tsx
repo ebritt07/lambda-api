@@ -1,19 +1,15 @@
 import { useState } from "react";
-import type { User } from "oidc-client-ts";
+import { useAuth } from "react-oidc-context";
 import NavBarGroup from "./NavBarGroup";
 import "./navbar.css";
 
 interface Props {
-  isAuthenticated: boolean;
-  canSignIn: boolean;
-  user: User | null;
-  onSignIn: () => void;
-  onSignOut: () => void;
   selectedMenuId: string;
   setSelectedMenuId: (id: string) => void;
 }
 
 const Navbar = (props: Props) => {
+  const auth = useAuth();
 
   const bicycleMenuItems = [
     { "name": "Info", emoji: "📚", "id": "1a" },
@@ -42,13 +38,14 @@ const Navbar = (props: Props) => {
   const toNonEmptyString = (value: unknown): string | undefined =>
     typeof value === "string" && value.trim() !== "" ? value : undefined;
 
-  const userLabel = props.user?.profile["cognito:username"]
-    ? toNonEmptyString(props.user.profile["cognito:username"])
+  const userLabel = auth.user?.profile["cognito:username"]
+    ? toNonEmptyString(auth.user.profile["cognito:username"])
     : undefined;
-  const fallbackUserLabel = toNonEmptyString(props.user?.profile.preferred_username)
-    || toNonEmptyString(props.user?.profile.sub)
-    || "@username";
-  const resolvedUserLabel = userLabel || fallbackUserLabel;
+  const fallbackUserLabel = toNonEmptyString(auth.user?.profile.preferred_username)
+    || toNonEmptyString(auth.user?.profile.sub)
+    || "username";
+  const resolvedUserLabel = (userLabel || fallbackUserLabel).replace(/^@+/, "");
+  const isAuthenticated = Boolean(auth.isAuthenticated && auth.user);
 
   return (
     <div
@@ -59,7 +56,7 @@ const Navbar = (props: Props) => {
       <div className="nav-panel">
         <div>
 
-          <h5><i style={{ paddingLeft: "30px" }}>{props.isAuthenticated ? `@${resolvedUserLabel}` : "@username"}</i></h5>
+          <h5><i style={{ paddingLeft: "30px" }}>{isAuthenticated ? `@${resolvedUserLabel}` : "@username"}</i></h5>
         </div>
 
         <NavBarGroup

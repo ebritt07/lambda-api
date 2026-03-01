@@ -1,18 +1,13 @@
 import { useMemo, useState } from "react";
 import type { User } from "oidc-client-ts";
+import { useAuth } from "react-oidc-context";
 import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
-interface Props {
-  isAuthenticated: boolean;
-  user: User | null;
-  onSignIn: () => void;
-  onSignOut: () => void;
-}
+import { buildCognitoSignOutUrl } from "../../auth/cognitoConfig";
 
 const getProfileTextValue = (user: User | null, key: string): string => {
   const value = user?.profile[key];
@@ -47,7 +42,10 @@ interface UserFieldRow {
   value: string;
 }
 
-const UserView = ({ isAuthenticated, user, onSignIn, onSignOut }: Props) => {
+const UserView = () => {
+  const auth = useAuth();
+  const user: User | null = auth.user ?? null;
+  const isAuthenticated = Boolean(auth.isAuthenticated && user);
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
   const userRows = useMemo<UserFieldRow[]>(
     () => [
@@ -86,6 +84,15 @@ const UserView = ({ isAuthenticated, user, onSignIn, onSignOut }: Props) => {
     } catch {
       setCopyStatus("failed");
     }
+  };
+
+  const handleSignIn = () => {
+    void auth.signinRedirect();
+  };
+
+  const handleSignOut = () => {
+    void auth.removeUser();
+    window.location.href = buildCognitoSignOutUrl();
   };
 
   return (
@@ -137,11 +144,11 @@ const UserView = ({ isAuthenticated, user, onSignIn, onSignOut }: Props) => {
         </p>
       ) : null}
       {isAuthenticated ? (
-        <button type="button" onClick={onSignOut}>
+        <button type="button" onClick={handleSignOut}>
           Sign Out
         </button>
       ) : (
-        <button type="button" onClick={onSignIn}>
+        <button type="button" onClick={handleSignIn}>
           Sign In
         </button>
       )}
