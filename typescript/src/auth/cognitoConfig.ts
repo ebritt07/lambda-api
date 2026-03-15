@@ -12,7 +12,7 @@ export const cognitoAuthConfig = {
   client_id: COGNITO_CLIENT_ID,
   redirect_uri: getRedirectUri(),
   response_type: "code",
-  scope: "email openid ebritt07.click/bike.modify",
+  scope: "openid email phone ebritt07.click/bike.modify",
 };
 
 export const buildCognitoSignOutUrl = (): string => {

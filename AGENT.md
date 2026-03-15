@@ -70,6 +70,9 @@
   - Sets up Python 3.13 + JDK 21, installs deps, builds DynamoDB Local, runs flake8 + pytest
   - Actually runs all tests including DynamoDB integration
   - Uploads test artifacts, posts coverage comment on PRs
+- TypeScript CI: `.github/workflows/typescript-app.yml`
+  - Runs on pull requests to `main`
+  - Installs deps, runs lint + tests + production build in `typescript/`
 - Terraform deploy (dev): `.github/workflows/tf-deploy-dev.yml`
   - `tf-plan` on pushes to `main`, `feature-*`, `bugfix-*`
   - `tf-apply` only on `main` push
