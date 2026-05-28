@@ -52,12 +52,24 @@ class LocalDynamoManager():
         self.clean_all_tables()
 
         for table_name in TABLE_NAMES:
-            table = self.ddb_cli.dynamodb.create_table(
-                TableName=table_name,
-                KeySchema=[{"AttributeName": "id", "KeyType": "HASH"}],
-                AttributeDefinitions=[{"AttributeName": "id", "AttributeType": "S"}],
-                BillingMode="PAY_PER_REQUEST",
-            )
+            create_kwargs = {
+                "TableName": table_name,
+                "KeySchema": [{"AttributeName": "id", "KeyType": "HASH"}],
+                "AttributeDefinitions": [{"AttributeName": "id", "AttributeType": "S"}],
+                "BillingMode": "PAY_PER_REQUEST",
+            }
+            if table_name == Table.BIKES:
+                create_kwargs["AttributeDefinitions"].append(
+                    {"AttributeName": "owner_id", "AttributeType": "S"}
+                )
+                create_kwargs["GlobalSecondaryIndexes"] = [
+                    {
+                        "IndexName": "owner_id-index",
+                        "KeySchema": [{"AttributeName": "owner_id", "KeyType": "HASH"}],
+                        "Projection": {"ProjectionType": "ALL"},
+                    }
+                ]
+            table = self.ddb_cli.dynamodb.create_table(**create_kwargs)
             table.wait_until_exists()
             logger.info("table '%s' created successfully", table_name)
 

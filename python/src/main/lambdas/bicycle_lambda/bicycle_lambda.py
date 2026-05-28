@@ -2,6 +2,8 @@ from dataclasses import asdict
 import base64
 import json
 
+from boto3.dynamodb.conditions import Key
+
 from src.main.lambdas.common.dynamo_db_client import DynamoDbClient
 from src.main.lambdas.common.dynamo_db_client import Table
 from src.main.lambdas.common.dynamo_schema import Bike
@@ -11,6 +13,7 @@ from src.main.lambdas.common.api_gateway_response import api_response
 
 ddb = DynamoDbClient()
 table = ddb.dynamodb.Table(Table.BIKES)
+OWNER_ID_INDEX = "owner_id-index"
 MAX_LIST_LIMIT = 100
 DEFAULT_LIST_LIMIT = 25
 LIST_PROJECTION_ATTRS = ("id", "make", "model", "style", "notes")
@@ -93,6 +96,44 @@ def _list_bikes(event: dict):
     )
 
 
+def _list_my_bikes(event: dict):
+    caller_sub = get_caller_sub(event)
+    if not caller_sub:
+        return api_response({"message": "Unauthorized"}, status_code=401)
+
+    query_params = event.get("queryStringParameters") or {}
+    try:
+        limit = _parse_list_limit(query_params)
+        exclusive_start_key = _decode_next_token(query_params.get("next_token"))
+    except ValueError as exc:
+        return api_response({"message": str(exc)}, status_code=400)
+
+    query_kwargs = {
+        "IndexName": OWNER_ID_INDEX,
+        "KeyConditionExpression": Key("owner_id").eq(caller_sub),
+        "Limit": limit,
+    }
+    if exclusive_start_key:
+        query_kwargs["ExclusiveStartKey"] = exclusive_start_key
+
+    response = table.query(**query_kwargs)
+    items = response.get("Items", [])
+    returned_count = len(items)
+    logger.info(
+        "my-bikes query owner_id=%s limit=%s returned_count=%s",
+        caller_sub,
+        limit,
+        returned_count,
+    )
+    return api_response(
+        {
+            "items": items,
+            "next_token": _encode_next_token(response.get("LastEvaluatedKey")),
+            "count": returned_count,
+        }
+    )
+
+
 def handler(event, context):
     method = event["httpMethod"]
     path = _request_path(event)
@@ -100,6 +141,9 @@ def handler(event, context):
     if method == "GET":
         if path.endswith("/bike/list"):
             return _list_bikes(event)
+
+        if path.endswith("/bike/my-bikes"):
+            return _list_my_bikes(event)
 
         query_params = event.get("queryStringParameters") or {}
         bike_id = query_params.get("id")
