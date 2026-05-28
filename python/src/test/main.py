@@ -72,6 +72,25 @@ async def list_bikes(
     return _unwrap_api_response(bicycle_lambda.handler(event, {}))
 
 
+@bicycle_lambda_router.get("/my-bikes", name="list my bikes")
+async def list_my_bikes(
+        request: Request,
+        limit: int = Query(25, ge=1, le=100),
+        next_token: str | None = Query(None),
+) -> BikeListResponseDTO | dict:
+    query_params = {"limit": str(limit)}
+    if next_token is not None:
+        query_params["next_token"] = next_token
+    api_data = APIGatewayTestEvent(
+        method="GET",
+        raw_path="/bike/my-bikes",
+        query_params=query_params,
+        authorizer_claims=_extract_claims_from_auth_header(request),
+    )
+    event = api_data.export_event()
+    return _unwrap_api_response(bicycle_lambda.handler(event, {}))
+
+
 @bicycle_lambda_router.put("", name="update bike by id")
 async def update_bike(
         request: Request,

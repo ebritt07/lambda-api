@@ -243,3 +243,99 @@ def test_bike_list_scan_paginates_and_hides_owner_id(client):
 def test_bike_list_invalid_next_token_returns_400(client):
     response = client.get("/bike/list", params={"next_token": "not-a-valid-token"})
     assert response.status_code == 400
+
+
+@pytest.mark.skipif(
+    _is_codex_env(),
+    reason="DynamoDB Local cannot bind sockets in Codex environment",
+)
+def test_my_bikes_requires_auth(client):
+    response = client.get("/bike/my-bikes")
+    assert response.status_code == 401
+
+
+@pytest.mark.skipif(
+    _is_codex_env(),
+    reason="DynamoDB Local cannot bind sockets in Codex environment",
+)
+def test_my_bikes_returns_only_caller_bikes(client):
+    _clear_bikes_table()
+
+    owner_headers = _bearer_headers("owner-user")
+    other_headers = _bearer_headers("other-user")
+
+    owner_ids = set()
+    for i in range(3):
+        response = client.post(
+            "/bike/new",
+            json={"make": f"OwnerBike-{i}", "model": f"M-{i}", "style": "ROAD", "notes": None},
+            headers=owner_headers,
+        )
+        assert response.status_code == 200
+        owner_ids.add(response.json()["id"])
+
+    for i in range(2):
+        response = client.post(
+            "/bike/new",
+            json={"make": f"OtherBike-{i}", "model": f"M-{i}", "style": "ROAD", "notes": None},
+            headers=other_headers,
+        )
+        assert response.status_code == 200
+
+    response = client.get("/bike/my-bikes", headers=owner_headers)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["count"] == 3
+    returned_ids = {item["id"] for item in data["items"]}
+    assert returned_ids == owner_ids
+    for item in data["items"]:
+        assert item["owner_id"] == "owner-user"
+
+
+@pytest.mark.skipif(
+    _is_codex_env(),
+    reason="DynamoDB Local cannot bind sockets in Codex environment",
+)
+def test_my_bikes_paginates(client):
+    _clear_bikes_table()
+
+    headers = _bearer_headers("paginate-user")
+    for i in range(3):
+        response = client.post(
+            "/bike/new",
+            json={"make": f"PaginateBike-{i}", "model": f"M-{i}", "style": "ROAD", "notes": None},
+            headers=headers,
+        )
+        assert response.status_code == 200
+
+    page_1 = client.get("/bike/my-bikes", params={"limit": 2}, headers=headers)
+    assert page_1.status_code == 200
+    page_1_data = page_1.json()
+    assert page_1_data["count"] == 2
+    assert page_1_data["next_token"] is not None
+
+    page_2 = client.get(
+        "/bike/my-bikes",
+        params={"limit": 2, "next_token": page_1_data["next_token"]},
+        headers=headers,
+    )
+    assert page_2.status_code == 200
+    page_2_data = page_2.json()
+    assert page_2_data["count"] == 1
+    assert page_2_data["next_token"] is None
+
+    all_ids = {item["id"] for item in page_1_data["items"] + page_2_data["items"]}
+    assert len(all_ids) == 3
+
+
+@pytest.mark.skipif(
+    _is_codex_env(),
+    reason="DynamoDB Local cannot bind sockets in Codex environment",
+)
+def test_my_bikes_invalid_next_token_returns_400(client):
+    response = client.get(
+        "/bike/my-bikes",
+        params={"next_token": "not-a-valid-token"},
+        headers=_bearer_headers("some-user"),
+    )
+    assert response.status_code == 400
