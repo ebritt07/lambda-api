@@ -138,6 +138,12 @@ def handler(event, context):
     method = event["httpMethod"]
     path = _request_path(event)
 
+    if method == "OPTIONS":
+        return api_response({}, headers={
+            "Access-Control-Allow-Headers": "Authorization,Content-Type",
+            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,OPTIONS",
+        })
+
     if method == "GET":
         if path.endswith("/bike/list"):
             return _list_bikes(event)

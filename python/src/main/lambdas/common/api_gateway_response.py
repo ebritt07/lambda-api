@@ -2,6 +2,8 @@ import json
 from dataclasses import asdict, is_dataclass
 from typing import Any, Dict, Optional
 
+_CORS_ORIGIN_HEADER = {"Access-Control-Allow-Origin": "*"}
+
 
 def _normalize_body(body: Any) -> Any:
     if is_dataclass(body):
@@ -21,6 +23,7 @@ def api_response(
         "statusCode": status_code,
         "headers": {
             "content-type": "application/json",
+            **_CORS_ORIGIN_HEADER,
             **(headers or {}),
         },
         "body": json.dumps(safe_body, default=str),

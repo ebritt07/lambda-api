@@ -22,6 +22,7 @@ Run the same steps as the CI deployment stage inside a container (Python 3.13 + 
 - `cd /python`
 - `/usr/local/bin/python3.13 -m venv .venv`
 - `source .venv/bin/activate`
+- `pip install -r requirements-test.txt`
 - `export PYTHONPATH=$PYTHONPATH:.`
 - test via interactive UI:
 - `python src/test/main.py`
