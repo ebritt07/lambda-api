@@ -236,6 +236,83 @@
                 }
             }
         },
+        "/bike/my-bikes": {
+            "get": {
+                "tags": [
+                    "bicycle lambdas"
+                ],
+                "summary": "List My Bikes",
+                "operationId": "list_my_bikes_bike_my_bikes_get",
+                "security": [
+                    {
+                        "ebritt07-authorizer": [
+                            "ebritt07.click/bike.read"
+                        ]
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "default": 25,
+                            "title": "Limit"
+                        }
+                    },
+                    {
+                        "name": "next_token",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Next Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/components/schemas/BikeListResponseDTO"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "additionalProperties": true
+                                        }
+                                    ],
+                                    "title": "Response List My Bikes Bike My Bikes Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/bike/new": {
             "post": {
                 "tags": [
