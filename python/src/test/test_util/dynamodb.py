@@ -1,4 +1,5 @@
 import os
+import socket
 import subprocess
 import time
 
@@ -7,6 +8,28 @@ from src.main.lambdas.common.logger import logger
 from src.main.lambdas.common.dynamo_db_client import Table
 
 TABLE_NAMES = Table.__members__.values()
+
+STARTUP_TIMEOUT_SECONDS = 90
+
+
+def wait_for_port(port, process, timeout=STARTUP_TIMEOUT_SECONDS):
+    """Block until something accepts TCP connections on localhost:port.
+
+    A cold `mvn exec:java` (e.g. on a fresh CI runner) can take well over a
+    couple of seconds to start DynamoDB Local, so poll instead of sleeping.
+    """
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if process.poll() is not None:
+            raise RuntimeError(
+                "DynamoDB Local exited early with code {}".format(process.returncode))
+        try:
+            with socket.create_connection(("localhost", int(port)), timeout=1):
+                return
+        except OSError:
+            time.sleep(0.5)
+    raise RuntimeError(
+        "DynamoDB Local not accepting connections on port {} after {}s".format(port, timeout))
 
 
 def get_start_command():
@@ -48,7 +71,7 @@ class LocalDynamoManager():
         self.dynamodb_local_process = subprocess.Popen(get_start_command().split())
         self.running = True
         self.ddb_cli = DynamoDbClient()
-        time.sleep(2)
+        wait_for_port(DYNAMO_LOCAL_PORT, self.dynamodb_local_process)
         self.clean_all_tables()
 
         for table_name in TABLE_NAMES:
